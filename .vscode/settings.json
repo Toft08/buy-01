@@ -1,0 +1,129 @@
+{
+    // Workspace settings
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": false,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+        "source.fixAll": "explicit"
+    },
+    // File associations
+    "files.associations": {
+        "*.component.html": "html",
+        "*.component.ts": "typescript"
+    },
+    // Prettier configuration
+    "prettier.requireConfig": true,
+    "prettier.useEditorConfig": false,
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[css]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[scss]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    // Java formatting
+    "[java]": {
+        "editor.defaultFormatter": "redhat.java",
+        "editor.formatOnSave": true
+    },
+    // TypeScript/Angular specific
+    "typescript.preferences.organizeImports": true,
+    "typescript.format.enable": true,
+    "typescript.validate.enable": true,
+    "typescript.suggest.autoImports": true,
+    // Java specific
+    "java.format.settings.url": "./.java-style",
+    "java.saveActions.organizeImports": true,
+    "java.configuration.checkProjectSettingsExclusions": false,
+    // Git
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "git.autofetch": true,
+    // Explorer
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    // Terminal
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    // Emmet
+    "emmet.includeLanguages": {
+        "typescript": "html"
+    },
+    // SonarLint
+    "sonarlint.rules": {
+        "typescript:S1128": "off", // Unused imports
+        "java:S1128": "off" // Unused imports
+    },
+    // Files to exclude from search
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/target": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/.git": true,
+        "**/.DS_Store": true
+    },
+    // Files to exclude from file watcher
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/target/**": true,
+        "**/dist/**": true,
+        "**/build/**": true
+    },
+    // Auto save
+    "files.autoSave": "onFocusChange",
+    // Bracket pair colorization
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": true,
+    // Minimap
+    "editor.minimap.enabled": true,
+    "editor.minimap.maxColumn": 120,
+    // Word wrap
+    "editor.wordWrap": "bounded",
+    "editor.wordWrapColumn": 100,
+    // Tabs
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": true,
+    // Linting
+    "eslint.validate": [
+        "javascript",
+        "typescript",
+        "html"
+    ],
+    "eslint.format.enable": true,
+    // TODO Highlight
+    "todohighlight.keywords": [
+        {
+            "text": "TODO:",
+            "color": "#ff6b6b",
+            "backgroundColor": "transparent"
+        },
+        {
+            "text": "FIXME:",
+            "color": "#ffa500",
+            "backgroundColor": "transparent"
+        },
+        {
+            "text": "NOTE:",
+            "color": "#4ecdc4",
+            "backgroundColor": "transparent"
+        }
+    ]
+}

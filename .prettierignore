@@ -1,0 +1,14 @@
+*.log
+node_modules/
+dist/
+build/
+target/
+.DS_Store
+.vscode/settings.json
+.idea/
+*.iml
+*.iws
+*.ipr
+.settings/
+.project
+.classpath

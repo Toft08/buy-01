@@ -1,0 +1,67 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Angular App",
+            "type": "chrome",
+            "request": "launch",
+            "preLaunchTask": "npm: start",
+            "url": "http://localhost:4200/#",
+            "webRoot": "${workspaceFolder}/frontend/src",
+            "sourceMapPathOverrides": {
+                "webpack:/*": "${webRoot}/*",
+                "/./*": "${webRoot}/*",
+                "/src/*": "${webRoot}/*",
+                "/*": "*",
+                "/./~/*": "${webRoot}/node_modules/*"
+            }
+        },
+        {
+            "name": "Debug User Service",
+            "type": "java",
+            "request": "launch",
+            "mainClass": "com.buyapp.userservice.UserServiceApplication",
+            "projectName": "user-service",
+            "args": "",
+            "vmArgs": "-Dspring.profiles.active=dev"
+        },
+        {
+            "name": "Debug Product Service",
+            "type": "java",
+            "request": "launch",
+            "mainClass": "com.buyapp.productservice.ProductServiceApplication",
+            "projectName": "product-service",
+            "args": "",
+            "vmArgs": "-Dspring.profiles.active=dev"
+        },
+        {
+            "name": "Debug Media Service",
+            "type": "java",
+            "request": "launch",
+            "mainClass": "com.buyapp.mediaservice.MediaServiceApplication",
+            "projectName": "media-service",
+            "args": "",
+            "vmArgs": "-Dspring.profiles.active=dev"
+        },
+        {
+            "name": "Debug Tests",
+            "type": "java",
+            "request": "launch",
+            "mainClass": "",
+            "projectName": "",
+            "args": "",
+            "vmArgs": "-Dspring.profiles.active=test"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Launch Full Stack",
+            "configurations": [
+                "Debug User Service",
+                "Debug Product Service",
+                "Debug Media Service",
+                "Debug Angular App"
+            ]
+        }
+    ]
+}

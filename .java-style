@@ -1,0 +1,46 @@
+# Google Java Style Guide
+# https://google.github.io/styleguide/javaguide.html
+
+# Basic formatting
+indent_type=space
+indent_size=4
+continuation_indent_size=8
+max_line_length=100
+
+# Import organization
+import_layout=\
+    *,\
+    |,\
+    javax.**,\
+    java.**,\
+    |,\
+    org.springframework.**,\
+    |,\
+    static *
+
+# Blank lines
+blank_lines_around_class=1
+blank_lines_around_method=1
+blank_lines_before_imports=1
+blank_lines_after_imports=1
+
+# Braces
+brace_style=end_of_line
+class_brace_style=end_of_line
+method_brace_style=end_of_line
+
+# Spaces
+space_around_assignment_operators=true
+space_around_logical_operators=true
+space_around_equality_operators=true
+space_around_relational_operators=true
+space_around_bitwise_operators=true
+space_around_additive_operators=true
+space_around_multiplicative_operators=true
+space_around_shift_operators=true
+space_around_unary_operators=false
+space_within_brackets=false
+space_within_array_brackets=false
+space_within_parentheses=false
+space_within_method_call_parentheses=false
+space_within_method_parentheses=false

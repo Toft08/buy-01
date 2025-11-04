@@ -1,0 +1,33 @@
+{
+    "recommendations": [
+        // Essential Extensions
+        "ms-vscode.vscode-java-pack",
+        "angular.ng-template",
+        "ms-vscode.vscode-typescript-next",
+        // Code Formatting & Quality
+        "esbenp.prettier-vscode",
+        "ms-vsliveshare.vsliveshare",
+        "editorconfig.editorconfig",
+        "sonarsource.sonarlint-vscode",
+        // Git & GitHub
+        "github.vscode-pull-request-github",
+        "github.copilot",
+        "github.copilot-chat",
+        "eamodio.gitlens",
+        // Docker & DevOps
+        "ms-vscode-remote.remote-containers",
+        "ms-azuretools.vscode-docker",
+        // Database
+        "mongodb.mongodb-vscode",
+        // Testing
+        "ms-vscode.test-adapter-converter",
+        "hbenl.vscode-test-explorer",
+        // Productivity
+        "ms-vscode.todo-highlight",
+        "gruntfuggly.todo-tree",
+        "bradlc.vscode-tailwindcss",
+        // API Development
+        "humao.rest-client",
+        "rangav.vscode-thunder-client"
+    ]
+}

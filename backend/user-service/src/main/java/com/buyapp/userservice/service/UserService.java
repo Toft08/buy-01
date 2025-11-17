@@ -101,21 +101,23 @@ public class UserService {
     public void deleteUser(String id, UserDetails userDetails) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        
+
         if ("seller".equalsIgnoreCase(user.getRole())) {
-            // For sellers, we need to call the product service to delete their products first
+            // For sellers, we need to call the product service to delete their products
+            // first
             try {
                 webClientBuilder.build()
-                    .delete()
-                    .uri("http://product-service/products/user/{userId}", id)
-                    .retrieve()
-                    .toBodilessEntity()
-                    .block();
+                        .delete()
+                        .uri("http://product-service/products/user/{userId}", id)
+                        .retrieve()
+                        .toBodilessEntity()
+                        .block();
             } catch (Exception e) {
-                throw new ForbiddenException("Cannot delete seller account. Please contact support to remove associated products first.");
+                throw new ForbiddenException(
+                        "Cannot delete seller account. Please contact support to remove associated products first.");
             }
         }
-        
+
         // Delete the user
         userRepository.deleteById(id);
     }

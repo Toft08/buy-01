@@ -1,4 +1,3 @@
-com/buyapp/userservice/security/CustomUserDetailsService.class
 com/buyapp/userservice/model/Role.class
 com/buyapp/userservice/config/WebClientConfig.class
 com/buyapp/userservice/repository/UserRepository.class

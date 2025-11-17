@@ -1,0 +1,7 @@
+com/buyapp/productservice/ProductServiceApplication.class
+com/buyapp/productservice/config/SecurityConfig.class
+com/buyapp/productservice/controller/ProductController.class
+com/buyapp/productservice/repository/ProductRepository.class
+com/buyapp/productservice/config/WebClientConfig.class
+com/buyapp/productservice/service/ProductService.class
+com/buyapp/productservice/model/Product.class

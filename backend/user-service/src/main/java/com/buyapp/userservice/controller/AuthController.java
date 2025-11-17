@@ -52,7 +52,7 @@ public class AuthController {
         }
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
-        
+
         // Create HttpOnly cookie for the JWT token
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
@@ -97,14 +97,14 @@ public class AuthController {
                 .body(Map.of(
                         "user", createdUser,
                         "token", token,
-                        "message", "User registered successfully"
-                ));
+                        "message", "User registered successfully"));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, @RequestHeader(value = "Authorization", required = false) String header) {
+    public ResponseEntity<String> logout(HttpServletRequest request,
+            @RequestHeader(value = "Authorization", required = false) String header) {
         String token = null;
-        
+
         // Try to get token from Authorization header first
         if (header != null && header.startsWith("Bearer ")) {
             token = header.substring(7);
@@ -120,12 +120,12 @@ public class AuthController {
                 }
             }
         }
-        
+
         if (token != null) {
             Date expiry = jwtUtil.extractExpiration(token);
             tokenBlacklist.blacklistToken(token, expiry);
         }
-        
+
         // Clear the JWT cookie
         ResponseCookie clearCookie = ResponseCookie.from("jwt", "")
                 .httpOnly(true)
@@ -134,7 +134,7 @@ public class AuthController {
                 .maxAge(0) // Expire immediately
                 .path("/")
                 .build();
-        
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
                 .body("Logged out successfully.");

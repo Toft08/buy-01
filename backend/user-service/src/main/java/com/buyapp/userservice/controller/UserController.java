@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    
+
     @Autowired
     private UserService userService;
 
@@ -30,6 +30,12 @@ public class UserController {
     public UserDto getUserById(@PathVariable String id) {
         // This endpoint is for internal service calls, so no strict authorization
         return userService.getUserById(id);
+    }
+
+    @GetMapping("/email/{email}")
+    public UserDto getUserByEmail(@PathVariable String email) {
+        // This endpoint is for internal service calls, so no strict authorization
+        return userService.getUserByEmail(email);
     }
 
     @GetMapping("/me")
@@ -55,7 +61,8 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public UserDto updateUser(@PathVariable String id, @Valid @RequestBody UserDto userDto, Authentication authentication) {
+    public UserDto updateUser(@PathVariable String id, @Valid @RequestBody UserDto userDto,
+            Authentication authentication) {
         return userService.updateUser(id, userDto, authentication);
     }
 
@@ -65,7 +72,7 @@ public class UserController {
         if (!userService.existsById(id)) {
             throw new ResourceNotFoundException("User not found with id:" + id);
         }
-        
+
         userService.deleteUser(id, userDetails);
     }
 

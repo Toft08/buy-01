@@ -29,7 +29,8 @@ public class User {
 
     private String avatar; // Optional avatar image path for sellers
 
-    public User() {}
+    public User() {
+    }
 
     public User(String id, String name, String email, String password, Role role) {
         this.id = id;
@@ -49,22 +50,55 @@ public class User {
     }
 
     // Getters and Setters
-    public String getId() {return id;}
-    
-    public String getName() {return name;}
-    public void setName(String name) {this.name = name;}
+    public String getId() {
+        return id;
+    }
 
-    public String getEmail() { return email;}
-    public void setEmail( String email) { this.email = email;}
+    public String getName() {
+        return name;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) {this.password = password; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String getRole() { return role.getValue(); }
-    public void setRole(Role role) {this.role = role; }
-    public void setRole(String role) {this.role = Role.fromString(role); }
-    public Role getRoleEnum() { return role; }
+    public String getEmail() {
+        return email;
+    }
 
-    public String getAvatar() { return avatar; }
-    public void setAvatar(String avatar) { this.avatar = avatar; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRole() {
+        return role.getValue();
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public void setRole(String role) {
+        this.role = Role.fromString(role);
+    }
+
+    public Role getRoleEnum() {
+        return role;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
 }

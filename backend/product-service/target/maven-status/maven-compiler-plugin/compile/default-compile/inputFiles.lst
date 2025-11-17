@@ -1,0 +1,7 @@
+/Users/ToftD/Desktop/buy-01/backend/product-service/src/main/java/com/buyapp/productservice/ProductServiceApplication.java
+/Users/ToftD/Desktop/buy-01/backend/product-service/src/main/java/com/buyapp/productservice/config/SecurityConfig.java
+/Users/ToftD/Desktop/buy-01/backend/product-service/src/main/java/com/buyapp/productservice/config/WebClientConfig.java
+/Users/ToftD/Desktop/buy-01/backend/product-service/src/main/java/com/buyapp/productservice/controller/ProductController.java
+/Users/ToftD/Desktop/buy-01/backend/product-service/src/main/java/com/buyapp/productservice/model/Product.java
+/Users/ToftD/Desktop/buy-01/backend/product-service/src/main/java/com/buyapp/productservice/repository/ProductRepository.java
+/Users/ToftD/Desktop/buy-01/backend/product-service/src/main/java/com/buyapp/productservice/service/ProductService.java

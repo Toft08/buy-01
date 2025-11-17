@@ -1,0 +1,7 @@
+/Users/ToftD/Desktop/buy-01/backend/media-service/src/main/java/com/buyapp/mediaservice/MediaServiceApplication.java
+/Users/ToftD/Desktop/buy-01/backend/media-service/src/main/java/com/buyapp/mediaservice/config/SecurityConfig.java
+/Users/ToftD/Desktop/buy-01/backend/media-service/src/main/java/com/buyapp/mediaservice/config/WebClientConfig.java
+/Users/ToftD/Desktop/buy-01/backend/media-service/src/main/java/com/buyapp/mediaservice/controller/MediaController.java
+/Users/ToftD/Desktop/buy-01/backend/media-service/src/main/java/com/buyapp/mediaservice/model/Media.java
+/Users/ToftD/Desktop/buy-01/backend/media-service/src/main/java/com/buyapp/mediaservice/repository/MediaRepository.java
+/Users/ToftD/Desktop/buy-01/backend/media-service/src/main/java/com/buyapp/mediaservice/service/MediaService.java

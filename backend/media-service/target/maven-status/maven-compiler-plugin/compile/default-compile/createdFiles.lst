@@ -1,0 +1,7 @@
+com/buyapp/mediaservice/service/MediaService.class
+com/buyapp/mediaservice/config/WebClientConfig.class
+com/buyapp/mediaservice/config/SecurityConfig.class
+com/buyapp/mediaservice/controller/MediaController.class
+com/buyapp/mediaservice/MediaServiceApplication.class
+com/buyapp/mediaservice/repository/MediaRepository.class
+com/buyapp/mediaservice/model/Media.class

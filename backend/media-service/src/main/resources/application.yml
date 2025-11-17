@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: media-service
+  
+  data:
+    mongodb:
+      database: media_service_db
+      host: localhost
+      port: 27017
+  
+  cloud:
+    compatibility-verifier:
+      enabled: false
+  
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+    hostname: localhost
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+
+application:
+  security:
+    jwt:
+      secret-key: mySecretKey
+      expiration: 86400000

@@ -30,6 +30,8 @@ management:
     health:
       show-details: always
 
-jwt:
-  secret: mySecretKey
-  expiration: 86400000
+application:
+  security:
+    jwt:
+      secret-key: bXlTZWNyZXRLZXlGb3JKV1RBdXRoZW50aWNhdGlvbjEyMzQ1Njc4OTBhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ej==
+      expiration: 86400000

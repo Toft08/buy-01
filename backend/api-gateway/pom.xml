@@ -60,11 +60,14 @@
         <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- Reactive Security -->
+        <!-- Reactive Security - COMMENTED OUT FOR NOW -->
+        <!-- TODO: Re-enable when implementing JWT forwarding -->
+        <!--
         <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+        -->
     </dependencies>
 
     <dependencyManagement>

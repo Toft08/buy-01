@@ -8,7 +8,6 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -46,12 +45,20 @@ public class JwtUtil {
     }
 
     public String generateToken(String email, String role) {
-        UserDetails userDetails = User
-                .withUsername(email)
-                .password("") // password not needed for JWT
-                .roles(role)
-                .build();
-        return generateToken(userDetails);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role.toUpperCase());
+
+        return Jwts.builder()
+                .claims(claims)
+                .subject(email)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
     public String extractUsername(String token) {

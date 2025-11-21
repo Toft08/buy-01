@@ -4,64 +4,62 @@ spring:
 
   cloud:
     gateway:
-      server:
-        webflux:
-          default-filters:
-            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-          globalcors:
-            cors-configurations:
-              '[/**]':
-                allowedOriginPatterns: '*'
-                allowedMethods:
-                  - GET
-                  - POST
-                  - PUT
-                  - DELETE
-                  - OPTIONS
-                allowedHeaders: '*'
-                allowCredentials: true
-                maxAge: 3600
-          routes:
-            # Auth routes (no auth)
-            - id: user-service-auth
-              uri: lb://user-service
-              predicates:
-                - Path=/auth/**
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: '*'
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: '*'
+            allowCredentials: true
+            maxAge: 3600
+      routes:
+        # Auth routes (no auth)
+        - id: user-service-auth
+          uri: lb://user-service
+          predicates:
+            - Path=/auth/**
 
-            # User Service routes
-            - id: user-service
-              uri: lb://user-service
-              predicates:
-                - Path=/users/**
+        # User Service routes
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/users/**
 
-            # Public Product routes (no auth)
-            - id: product-service-public
-              uri: lb://product-service
-              predicates:
-                - Path=/products
-                - Method=GET
+        # Public Product routes (no auth)
+        - id: product-service-public
+          uri: lb://product-service
+          predicates:
+            - Path=/products
+            - Method=GET
 
-            - id: product-service-public-by-id
-              uri: lb://product-service
-              predicates:
-                - Path=/products/{id}
-                - Method=GET
+        - id: product-service-public-by-id
+          uri: lb://product-service
+          predicates:
+            - Path=/products/{id}
+            - Method=GET
 
-            # Protected product routes (auth required)
-            - id: product-service-protected
-              uri: lb://product-service
-              predicates:
-                - Path=/products/**
+        # Protected product routes (auth required)
+        - id: product-service-protected
+          uri: lb://product-service
+          predicates:
+            - Path=/products/**
 
-            # Media Service Routes (auth requiered for uploads)
-            - id: media-service
-              uri: lb://media-service
-              predicates:
-                - Path=/media/**
-              filters:
-                - name: RequestSize
-                  args:
-                    maxSize: 2MB
+        # Media Service Routes (auth requiered for uploads)
+        - id: media-service
+          uri: lb://product-service
+          predicates:
+            - Path=/media/**
+          filters:
+            - name: RequestSize
+              args:
+                maxSize: 2MB
 
 server:
   port: 8080
@@ -92,5 +90,5 @@ logging:
 application:
   security:
     jwt:
-      secret-key: mySecretKey
+      secret-key: D341j5kfy5b3uFW/Xcw0KvP4/gfwho2UzAXAI6fGpUc=
       expiration: 86400000

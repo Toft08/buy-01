@@ -163,7 +163,38 @@ The frontend will be available at: `http://localhost:4200`
 
 ## Testing
 
-### Backend Testing
+### Quick Start
+```bash
+# Run all integration tests
+./run-tests.sh
+
+# Run specific service tests
+cd backend/services/user && ../../mvnw test
+cd backend/services/product && ../../mvnw test
+cd backend/services/media && ../../mvnw test
+```
+
+### Integration Tests
+**28 comprehensive integration tests** using:
+- ✅ **@SpringBootTest** - Full application context
+- ✅ **MockMvc** - HTTP endpoint testing
+- ✅ **Testcontainers** - Isolated MongoDB per test class
+- ✅ **JUnit 5** - Modern testing framework
+- ✅ **JwtTestUtil** - Real JWT token generation
+
+#### Test Coverage
+| Service | Tests | Coverage |
+|---------|-------|----------|
+| User Service | 8 | Registration, Login/Logout, Validation |
+| Product Service | 10 | CRUD, Authorization, Ownership |
+| Media Service | 10 | Upload, Download, Size Limits |
+
+#### Documentation
+- **[INTEGRATION-TESTING.md](INTEGRATION-TESTING.md)** - Complete testing guide
+- **[TESTING-QUICK-REFERENCE.md](TESTING-QUICK-REFERENCE.md)** - Quick reference card
+- **[TEST-IMPLEMENTATION-SUMMARY.md](TEST-IMPLEMENTATION-SUMMARY.md)** - Implementation details
+
+### Backend Testing (Legacy Bash Script)
 ```bash
 cd backend
 

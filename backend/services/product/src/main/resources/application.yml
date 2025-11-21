@@ -32,5 +32,5 @@ management:
 application:
   security:
     jwt:
-      secret-key: mySecretKey
+      secret-key: D341j5kfy5b3uFW/Xcw0KvP4/gfwho2UzAXAI6fGpUc=
       expiration: 86400000

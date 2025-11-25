@@ -1,0 +1,204 @@
+@use 'sass:color';
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// Base Card
+.card {
+  @include card-base();
+  padding: $spacing-xl;
+}
+
+// Product Card
+.product-card {
+  @include card-base();
+  @include card-hover();
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: $radius-md;
+    margin-bottom: $spacing-md;
+  }
+
+  .card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 $spacing-sm 0;
+    @include text-clamp(1);
+  }
+
+  .card-description {
+    color: $text-secondary;
+    margin-bottom: $spacing-md;
+    line-height: 1.6;
+    @include text-clamp(2);
+  }
+
+  .card-meta {
+    margin-top: auto;
+    padding-top: $spacing-md;
+    border-top: 1px solid $border-color;
+  }
+
+  .card-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $primary-color;
+    margin-bottom: $spacing-sm;
+  }
+
+  .card-quality {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: 4px 12px;
+    background: $bg-light;
+    border-radius: $radius-pill;
+    font-size: 0.875rem;
+    color: $text-secondary;
+
+    &::before {
+      content: '⭐';
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    gap: $spacing-sm;
+    margin-top: $spacing-md;
+  }
+
+  .card-footer {
+    padding-top: $spacing-md;
+    border-top: 1px solid $border-color;
+    margin-top: $spacing-md;
+  }
+}
+
+// Badge Cards for Stats
+.stat-card {
+  @include card-base();
+  padding: $spacing-lg;
+  text-align: center;
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0;
+  }
+
+  .stat-label {
+    color: $text-secondary;
+    margin-top: $spacing-xs;
+    font-size: 0.875rem;
+  }
+}
+
+// Info Card
+.info-card {
+  @include card-base();
+  padding: $spacing-lg;
+  background: color.adjust($info-color, $lightness: 45%);
+  border-left: 4px solid $info-color;
+
+  .info-title {
+    font-weight: 600;
+    color: $info-dark;
+    margin-bottom: $spacing-sm;
+  }
+
+  .info-content {
+    color: color.adjust($info-color, $lightness: -10%);
+  }
+}
+
+// Warning Card
+.warning-card {
+  @include card-base();
+  padding: $spacing-lg;
+  background: color.adjust($warning-color, $lightness: 45%);
+  border-left: 4px solid $warning-color;
+
+  .warning-title {
+    font-weight: 600;
+    color: color.adjust($warning-color, $lightness: -20%);
+    margin-bottom: $spacing-sm;
+  }
+
+  .warning-content {
+    color: color.adjust($warning-color, $lightness: -10%);
+  }
+}
+
+// Success Card
+.success-card {
+  @include card-base();
+  padding: $spacing-lg;
+  background: color.adjust($success-color, $lightness: 50%);
+  border-left: 4px solid $success-color;
+
+  .success-title {
+    font-weight: 600;
+    color: color.adjust($success-color, $lightness: -10%);
+    margin-bottom: $spacing-sm;
+  }
+
+  .success-content {
+    color: color.adjust($success-color, $lightness: -5%);
+  }
+}
+
+// Error Card
+.error-card {
+  @include card-base();
+  padding: $spacing-lg;
+  background: color.adjust($danger-color, $lightness: 45%);
+  border-left: 4px solid $danger-color;
+
+  .error-title {
+    font-weight: 600;
+    color: $danger-dark;
+    margin-bottom: $spacing-sm;
+  }
+
+  .error-content {
+    color: color.adjust($danger-color, $lightness: -10%);
+  }
+}
+
+// Card Grid
+.card-grid {
+  @include responsive-grid(3, $spacing-xl);
+}
+
+.card-grid-2 {
+  @include responsive-grid(2, $spacing-xl);
+}
+
+.card-grid-4 {
+  @include responsive-grid(4, $spacing-xl);
+
+  @media (max-width: $breakpoint-desktop) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: $breakpoint-tablet) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,158 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// Form Group
+.form-group {
+  margin-bottom: $spacing-lg;
+
+  label {
+    display: block;
+    margin-bottom: $spacing-sm;
+    font-weight: 500;
+    color: $text-primary;
+  }
+
+  &.required label::after {
+    content: ' *';
+    color: $danger-color;
+  }
+}
+
+// Form Row (for side-by-side fields)
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-lg;
+
+  @media (max-width: $breakpoint-tablet) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Base Input Styles
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='number'],
+input[type='tel'],
+input[type='url'],
+textarea,
+select {
+  @include form-input();
+}
+
+// Textarea Specific
+textarea {
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+// Select Specific
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23666' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+// Input with Icon
+.input-group {
+  position: relative;
+
+  input {
+    padding-left: 40px;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-secondary;
+    pointer-events: none;
+  }
+}
+
+// Input States
+input.error,
+textarea.error,
+select.error {
+  border-color: $danger-color;
+
+  &:focus {
+    border-color: $danger-color;
+    box-shadow: 0 0 0 3px rgba($danger-color, 0.1);
+  }
+}
+
+input.success,
+textarea.success,
+select.success {
+  border-color: $success-color;
+
+  &:focus {
+    border-color: $success-color;
+    box-shadow: 0 0 0 3px rgba($success-color, 0.1);
+  }
+}
+
+// Help Text
+.form-help {
+  display: block;
+  margin-top: $spacing-xs;
+  font-size: 0.875rem;
+  color: $text-secondary;
+}
+
+.form-error {
+  display: block;
+  margin-top: $spacing-xs;
+  font-size: 0.875rem;
+  color: $danger-color;
+}
+
+// Checkbox & Radio
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: auto;
+    cursor: pointer;
+  }
+
+  label {
+    margin: 0;
+    cursor: pointer;
+    font-weight: normal;
+  }
+}
+
+// Form Actions
+.form-actions {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-xl;
+
+  &.form-actions-end {
+    justify-content: flex-end;
+  }
+
+  &.form-actions-between {
+    justify-content: space-between;
+  }
+}
+
+// Disabled State
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background-color: $bg-light;
+  cursor: not-allowed;
+  opacity: 0.6;
+}

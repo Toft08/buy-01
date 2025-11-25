@@ -1,0 +1,108 @@
+@use 'sass:color';
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// Base Button
+.btn {
+  @include button-base();
+}
+
+// Primary Button
+.btn-primary {
+  @include button-base();
+  @include button-variant($primary-color, $primary-dark);
+}
+
+// Secondary Button (Gradient)
+.btn-secondary {
+  @include button-base();
+  background: linear-gradient(135deg, $secondary-color 0%, $secondary-dark 100%);
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(
+      135deg,
+      color.adjust($secondary-color, $lightness: 5%) 0%,
+      color.adjust($secondary-dark, $lightness: 5%) 100%
+    );
+    transform: translateY(-2px);
+    box-shadow: $shadow-hover;
+  }
+}
+
+// Danger/Delete Button
+.btn-danger,
+.btn-delete {
+  @include button-base();
+  @include button-variant($danger-color, $danger-dark);
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+// Info/Edit Button
+.btn-info,
+.btn-edit {
+  @include button-base();
+  @include button-variant($info-color, $info-dark);
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+// Success Button
+.btn-success {
+  @include button-base();
+  @include button-variant($success-color, $primary-dark);
+}
+
+// Warning Button
+.btn-warning {
+  @include button-base();
+  @include button-variant($warning-color, color.adjust($warning-color, $lightness: -10%));
+}
+
+// Logout Button
+.btn-logout {
+  @include button-base();
+  @include button-variant($danger-color, $danger-dark);
+  padding: 10px 20px;
+}
+
+// Small Button Variant
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+}
+
+// Large Button Variant
+.btn-lg {
+  padding: 16px 32px;
+  font-size: 1.125rem;
+}
+
+// Outline Button Variant
+.btn-outline {
+  @include button-base();
+  background: transparent;
+  border: 2px solid $primary-color;
+  color: $primary-color;
+
+  &:hover:not(:disabled) {
+    background: $primary-color;
+    color: white;
+    transform: translateY(-2px);
+  }
+}
+
+// Button Group
+.btn-group {
+  display: flex;
+  gap: $spacing-md;
+
+  &.btn-group-end {
+    justify-content: flex-end;
+  }
+
+  &.btn-group-center {
+    justify-content: center;
+  }
+}

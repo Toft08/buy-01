@@ -1,0 +1,111 @@
+<div class="seller-dashboard">
+  <div class="dashboard-header">
+    <h1>Seller Dashboard</h1>
+    <button (click)="logout()" class="btn-logout">Logout</button>
+  </div>
+
+  <div class="dashboard-header">
+    <h2>My Products</h2>
+    <button (click)="showAddForm = !showAddForm" class="btn-primary">
+      {{ showAddForm ? 'Cancel' : 'Add New Product' }}
+    </button>
+  </div>
+
+  <!-- Add Product Form -->
+  <div *ngIf="showAddForm" class="add-product-form">
+    <h2>Create New Product</h2>
+    <form (ngSubmit)="createProduct()">
+      <div class="form-group">
+        <label for="name">Product Name</label>
+        <input
+          id="name"
+          type="text"
+          [(ngModel)]="newProduct.name"
+          name="name"
+          placeholder="Enter product name"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          [(ngModel)]="newProduct.description"
+          name="description"
+          placeholder="Enter product description"
+          rows="4"
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="price">Price ($)</label>
+          <input
+            id="price"
+            type="number"
+            [(ngModel)]="newProduct.price"
+            name="price"
+            placeholder="0.00"
+            min="0"
+            step="0.01"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="quality">Quality (%)</label>
+          <input
+            id="quality"
+            type="number"
+            [(ngModel)]="newProduct.quality"
+            name="quality"
+            placeholder="0-100"
+            min="0"
+            max="100"
+            required
+          />
+        </div>
+      </div>
+
+      <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+      <div *ngIf="formError" class="error-message">{{ formError }}</div>
+
+      <div class="form-actions form-actions-end">
+        <button type="submit" class="btn-primary" [disabled]="submitting">
+          {{ submitting ? 'Creating...' : 'Create Product' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Products List -->
+  <div *ngIf="loading" class="loading">Loading your products...</div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div class="products-grid">
+    <div *ngFor="let product of myProducts" class="product-card">
+      <div class="card-content">
+        <h3 class="card-title">{{ product.name }}</h3>
+        <p class="card-description">{{ product.description }}</p>
+        <div class="card-meta">
+          <div class="card-price">${{ product.price }}</div>
+          <div class="card-quality">{{ product.quality }}%</div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button (click)="editProduct(product)" class="btn-edit">Edit</button>
+        <button (click)="deleteProduct(product.id!)" class="btn-delete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && myProducts.length === 0 && !showAddForm" class="empty-state">
+    <div class="empty-icon">📦</div>
+    <div class="empty-title">No Products Yet</div>
+    <p class="empty-message">You haven't added any products yet.</p>
+    <button (click)="showAddForm = true" class="btn-primary">Add Your First Product</button>
+  </div>
+</div>

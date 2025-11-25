@@ -1,0 +1,49 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// Seller Dashboard Container
+.seller-dashboard {
+  @include container();
+  padding-top: $spacing-xl;
+  padding-bottom: $spacing-xl;
+}
+
+// Dashboard Header
+.dashboard-header {
+  @include flex-between();
+  margin-bottom: $spacing-2xl;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+// Add Product Form
+.add-product-form {
+  @include card-base();
+  padding: $spacing-xl;
+  margin-bottom: $spacing-2xl;
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: $spacing-xl;
+    color: $text-primary;
+  }
+}
+
+// Product Actions in Cards
+.product-card {
+  .card-actions {
+    display: flex;
+    gap: $spacing-sm;
+    margin-top: $spacing-md;
+  }
+}
+
+// Component uses shared styles from:
+// - _buttons.scss for all button styling (btn-primary, btn-edit, btn-delete, btn-logout)
+// - _forms.scss for form-group, form-row, and input styling
+// - _cards.scss for product-card and card elements
+// - _utilities.scss for loading, error, and success message states

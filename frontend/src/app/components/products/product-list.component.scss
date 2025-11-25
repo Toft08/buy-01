@@ -1,0 +1,20 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// Product List Container
+.product-list-container {
+  @include container();
+  padding-top: $spacing-xl;
+  padding-bottom: $spacing-xl;
+}
+
+// Products Grid
+.products-grid {
+  @include responsive-grid(3, $spacing-xl);
+  margin-top: $spacing-xl;
+}
+
+// Component uses shared styles from:
+// - _buttons.scss for button styling
+// - _cards.scss for product-card styling
+// - _utilities.scss for loading and error states

@@ -80,12 +80,82 @@
     </form>
   </div>
 
+  <!-- Edit Product Form -->
+  <div *ngIf="showEditForm" class="edit-product-form">
+    <h2>Edit Product</h2>
+    <form (ngSubmit)="updateProduct()">
+      <div class="form-group">
+        <label for="edit-name">Product Name</label>
+        <input
+          id="edit-name"
+          type="text"
+          [(ngModel)]="editProduct.name"
+          name="edit-name"
+          placeholder="Enter product name"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-description">Description</label>
+        <textarea
+          id="edit-description"
+          [(ngModel)]="editProduct.description"
+          name="edit-description"
+          placeholder="Enter product description"
+          rows="4"
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit-price">Price ($)</label>
+          <input
+            id="edit-price"
+            type="number"
+            [(ngModel)]="editProduct.price"
+            name="edit-price"
+            placeholder="0.00"
+            min="0"
+            step="0.01"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-quality">Quality (%)</label>
+          <input
+            id="edit-quality"
+            type="number"
+            [(ngModel)]="editProduct.quality"
+            name="edit-quality"
+            placeholder="0-100"
+            min="0"
+            max="100"
+            required
+          />
+        </div>
+      </div>
+
+      <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+      <div *ngIf="formError" class="error-message">{{ formError }}</div>
+
+      <div class="form-actions form-actions-end">
+        <button type="button" class="btn-secondary" (click)="cancelEdit()">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="submitting">
+          {{ submitting ? 'Updating...' : 'Update Product' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
   <!-- Products List -->
   <div *ngIf="loading" class="loading">Loading your products...</div>
 
   <div *ngIf="error" class="error">{{ error }}</div>
 
-  <div class="products-grid">
+  <div *ngIf="!showAddForm && !showEditForm" class="products-grid">
     <div *ngFor="let product of myProducts" class="product-card">
       <div class="card-content">
         <h3 class="card-title">{{ product.name }}</h3>
@@ -96,13 +166,16 @@
         </div>
       </div>
       <div class="card-actions">
-        <button (click)="editProduct(product)" class="btn-edit">Edit</button>
+        <button (click)="openEditForm(product)" class="btn-edit">Edit</button>
         <button (click)="deleteProduct(product.id!)" class="btn-delete">Delete</button>
       </div>
     </div>
   </div>
 
-  <div *ngIf="!loading && myProducts.length === 0 && !showAddForm" class="empty-state">
+  <div
+    *ngIf="!loading && myProducts.length === 0 && !showAddForm && !showEditForm"
+    class="empty-state"
+  >
     <div class="empty-icon">📦</div>
     <div class="empty-title">No Products Yet</div>
     <p class="empty-message">You haven't added any products yet.</p>

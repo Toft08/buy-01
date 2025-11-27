@@ -11,22 +11,31 @@ import { Product } from '../../models/ecommerce.model';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './seller-dashboard.component.html',
-  styleUrl: './seller-dashboard.component.scss'
+  styleUrl: './seller-dashboard.component.scss',
 })
 export class SellerDashboardComponent implements OnInit {
   myProducts: Product[] = [];
   loading = true;
   error = '';
   showAddForm = false;
+  showEditForm = false;
   submitting = false;
   formError = '';
   successMessage = '';
+  editingProductId: string | null = null;
 
   newProduct: Product = {
     name: '',
     description: '',
     price: 0,
-    quality: 0
+    quality: 0,
+  };
+
+  editProduct: Product = {
+    name: '',
+    description: '',
+    price: 0,
+    quality: 0,
   };
 
   constructor(
@@ -41,7 +50,7 @@ export class SellerDashboardComponent implements OnInit {
   }
 
   checkSellerRole(): void {
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.subscribe((user) => {
       if (!user || user.role !== 'seller') {
         this.router.navigate(['/']);
       }
@@ -58,16 +67,21 @@ export class SellerDashboardComponent implements OnInit {
         console.error('Error loading products:', error);
         this.error = 'Failed to load your products.';
         this.loading = false;
-      }
+      },
     });
   }
 
   createProduct(): void {
     this.formError = '';
     this.successMessage = '';
-    
-    if (!this.newProduct.name || !this.newProduct.description || 
-        this.newProduct.price <= 0 || this.newProduct.quality < 0 || this.newProduct.quality > 100) {
+
+    if (
+      !this.newProduct.name ||
+      !this.newProduct.description ||
+      this.newProduct.price <= 0 ||
+      this.newProduct.quality < 0 ||
+      this.newProduct.quality > 100
+    ) {
       this.formError = 'Please fill in all fields correctly.';
       return;
     }
@@ -76,7 +90,6 @@ export class SellerDashboardComponent implements OnInit {
 
     this.productService.createProduct(this.newProduct).subscribe({
       next: (product) => {
-        console.log('Product created successfully:', product);
         this.myProducts.unshift(product);
         this.successMessage = 'Product created successfully!';
         this.resetForm();
@@ -87,14 +100,62 @@ export class SellerDashboardComponent implements OnInit {
         console.error('Error creating product:', error);
         this.formError = error.error?.message || 'Failed to create product. Please try again.';
         this.submitting = false;
-      }
+      },
     });
   }
 
-  editProduct(product: Product): void {
-    // TODO: Implement edit functionality
-    console.log('Edit product:', product);
-    alert('Edit functionality coming soon!');
+  openEditForm(product: Product): void {
+    this.editingProductId = product.id || null;
+    this.editProduct = { ...product };
+    this.showEditForm = true;
+    this.formError = '';
+    this.successMessage = '';
+  }
+
+  updateProduct(): void {
+    this.formError = '';
+    this.successMessage = '';
+
+    if (
+      !this.editProduct.name ||
+      !this.editProduct.description ||
+      this.editProduct.price <= 0 ||
+      this.editProduct.quality < 0 ||
+      this.editProduct.quality > 100
+    ) {
+      this.formError = 'Please fill in all fields correctly.';
+      return;
+    }
+
+    if (!this.editingProductId) {
+      this.formError = 'Product ID is missing.';
+      return;
+    }
+
+    this.submitting = true;
+
+    this.productService.updateProduct(this.editingProductId, this.editProduct).subscribe({
+      next: (updatedProduct) => {
+        const index = this.myProducts.findIndex((p) => p.id === this.editingProductId);
+        if (index !== -1) {
+          this.myProducts[index] = updatedProduct;
+        }
+        this.successMessage = 'Product updated successfully!';
+        this.resetEditForm();
+        this.showEditForm = false;
+        this.submitting = false;
+      },
+      error: (error) => {
+        console.error('Error updating product:', error);
+        this.formError = error.error?.message || 'Failed to update product. Please try again.';
+        this.submitting = false;
+      },
+    });
+  }
+
+  cancelEdit(): void {
+    this.showEditForm = false;
+    this.resetEditForm();
   }
 
   deleteProduct(id: string): void {
@@ -104,12 +165,13 @@ export class SellerDashboardComponent implements OnInit {
 
     this.productService.deleteProduct(id).subscribe({
       next: () => {
-        this.myProducts = this.myProducts.filter(p => p.id !== id);
+        this.myProducts = this.myProducts.filter((p) => p.id !== id);
+        this.successMessage = 'Product deleted successfully!';
       },
       error: (error) => {
         console.error('Error deleting product:', error);
-        alert('Failed to delete product. Please try again.');
-      }
+        this.error = 'Failed to delete product. Please try again.';
+      },
     });
   }
 
@@ -123,8 +185,19 @@ export class SellerDashboardComponent implements OnInit {
       name: '',
       description: '',
       price: 0,
-      quality: 0
+      quality: 0,
     };
+    this.formError = '';
+  }
+
+  resetEditForm(): void {
+    this.editProduct = {
+      name: '',
+      description: '',
+      price: 0,
+      quality: 0,
+    };
+    this.editingProductId = null;
     this.formError = '';
   }
 }

@@ -5,7 +5,7 @@ import { tap } from 'rxjs/operators';
 import { AuthResponse, LoginRequest, RegisterRequest, User } from '../models/ecommerce.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8080/auth';
@@ -17,36 +17,47 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials, {
-      withCredentials: true // Include cookies
-    }).pipe(
-      tap(response => {
-        this.setCurrentUser(response.user);
-        localStorage.setItem('token', response.token);
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/login`, credentials, {
+        withCredentials: true, // Include cookies
       })
-    );
+      .pipe(
+        tap((response) => {
+          this.setCurrentUser(response.user);
+          localStorage.setItem('token', response.token);
+        })
+      );
   }
 
   register(userData: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData, {
-      withCredentials: true // Include cookies
-    }).pipe(
-      tap(response => {
-        this.setCurrentUser(response.user);
-        localStorage.setItem('token', response.token);
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/register`, userData, {
+        withCredentials: true, // Include cookies
       })
-    );
+      .pipe(
+        tap((response) => {
+          this.setCurrentUser(response.user);
+          localStorage.setItem('token', response.token);
+        })
+      );
   }
 
   logout(): Observable<string> {
-    return this.http.post<string>(`${this.apiUrl}/logout`, {}, {
-      withCredentials: true,
-      responseType: 'text' as 'json'
-    }).pipe(
-      tap(() => {
-        this.clearCurrentUser();
-      })
-    );
+    return this.http
+      .post<string>(
+        `${this.apiUrl}/logout`,
+        {},
+        {
+          withCredentials: true,
+          responseType: 'text' as 'json',
+        }
+      )
+      .pipe(
+        tap(() => {
+          console.log('Logout response received, clearing user data');
+          this.clearCurrentUser();
+        })
+      );
   }
 
   getCurrentUser(): User | null {
@@ -70,8 +81,8 @@ export class AuthService {
   getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({
-      'Authorization': token ? `Bearer ${token}` : '',
-      'Content-Type': 'application/json'
+      Authorization: token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json',
     });
   }
 
@@ -89,7 +100,7 @@ export class AuthService {
   private loadUserFromStorage(): void {
     const userStr = localStorage.getItem('currentUser');
     const token = localStorage.getItem('token');
-    
+
     if (userStr && token) {
       try {
         const user = JSON.parse(userStr);

@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { CartItem } from '../../models/cart.model';
 import { Product } from '../../models/ecommerce.model';
+import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 
 @Component({
@@ -16,7 +18,7 @@ export class ProductListComponent implements OnInit {
   loading = true;
   error = '';
 
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService, private cartService: CartService) {}
 
   ngOnInit(): void {
     this.loadProducts();
@@ -34,5 +36,17 @@ export class ProductListComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  addToCart(product: Product): void {
+    const cartItem: CartItem = {
+      productId: product.id!,
+      productName: product.name,
+      price: product.price,
+      quantity: 1,
+    };
+
+    this.cartService.addToCart(cartItem);
+    console.log(`${product.name} added to cart!`);
   }
 }

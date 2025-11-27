@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.*;
+import static com.buyapp.common.event.ProductEvent.EventType.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductEventListenerTest {
@@ -27,7 +28,7 @@ class ProductEventListenerTest {
     void whenProductDeleted_thenDeletesMedia() {
         // Arrange: create a PRODUCT_DELETED event
         ProductEvent event = new ProductEvent();
-        event.setEventType("PRODUCT_DELETED");
+        event.setEventType(PRODUCT_DELETED);
         event.setProductId("prod-123");
 
         // Act: call handler directly
@@ -42,7 +43,7 @@ class ProductEventListenerTest {
     void whenProductCreated_thenNoMediaDeletion() {
         // Arrange
         ProductEvent event = new ProductEvent();
-        event.setEventType("PRODUCT_CREATED");
+        event.setEventType(PRODUCT_CREATED);
         event.setProductId("prod-456");
 
         // Act
@@ -56,7 +57,7 @@ class ProductEventListenerTest {
     void whenProductUpdated_thenNoMediaDeletion() {
         // Arrange
         ProductEvent event = new ProductEvent();
-        event.setEventType("PRODUCT_UPDATED");
+        event.setEventType(PRODUCT_UPDATED);
         event.setProductId("prod-789");
 
         // Act
@@ -70,7 +71,7 @@ class ProductEventListenerTest {
     void whenProductDeletedAndServiceThrows_thenErrorIsLogged() {
         // Arrange
         ProductEvent event = new ProductEvent();
-        event.setEventType("PRODUCT_DELETED");
+        event.setEventType(PRODUCT_DELETED);
         event.setProductId("prod-error");
 
         doThrow(new RuntimeException("Media deletion failed"))

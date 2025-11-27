@@ -19,24 +19,27 @@ public class ProductEventListener {
         this.mediaService = mediaService;
     }
 
-    @KafkaListener(topics = "${kafka.topic.product-events:product-events}", groupId = "${spring.kafka.consumer.group-id:media-service-group}", containerFactory = "productEventKafkaListenerContainerFactory")
+    @KafkaListener(topics = "${kafka.topic.product-events:product-events}",
+    groupId = "${spring.kafka.consumer.group-id:media-service-group}",
+    containerFactory = "productEventKafkaListenerContainerFactory")
+    
     public void handleProductEvent(ProductEvent event) {
         log.info("Received product event: {}", event);
 
         try {
             switch (event.getEventType()) {
-                case "PRODUCT_CREATED":
+                case PRODUCT_CREATED:
                     log.info("Product created: {} - Ready to accept media uploads", event.getProductId());
                     // Future: Pre-create media directories or prepare storage
                     break;
 
-                case "PRODUCT_DELETED":
+                case PRODUCT_DELETED:
                     log.info("Product deleted: {} - Cleaning up associated media", event.getProductId());
                     // Delete all media associated with this product
                     mediaService.deleteMediaByProductIdInternal(event.getProductId());
                     break;
 
-                case "PRODUCT_UPDATED":
+                case PRODUCT_UPDATED:
                     log.info("Product updated: {} - No media action required", event.getProductId());
                     // Future: Update metadata or thumbnails if needed
                     break;

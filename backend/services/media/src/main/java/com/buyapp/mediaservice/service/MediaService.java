@@ -99,7 +99,7 @@ public class MediaService {
 
             // Publish IMAGE_UPLOADED event
             MediaEvent event = new MediaEvent(
-                    "IMAGE_UPLOADED",
+                    MediaEvent.EventType.IMAGE_UPLOADED,
                     saved.getId(),
                     productId,
                     originalFilename,

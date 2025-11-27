@@ -61,7 +61,7 @@ public class ProductService {
 
         // Publish PRODUCT_CREATED event
         ProductEvent event = new ProductEvent(
-                "PRODUCT_CREATED",
+                ProductEvent.EventType.PRODUCT_CREATED,
                 saved.getId(),
                 saved.getName(),
                 user.getId(),
@@ -93,7 +93,7 @@ public class ProductService {
                     "User not found for updated product with userId: " + updated.getUserId());
         }
         ProductEvent event = new ProductEvent(
-                "PRODUCT_UPDATED",
+                ProductEvent.EventType.PRODUCT_UPDATED,
                 updated.getId(),
                 updated.getName(),
                 user.getId(),
@@ -118,7 +118,7 @@ public class ProductService {
                     "User not found with id: " + existing.getUserId() + " when deleting product: " + id);
         }
         ProductEvent event = new ProductEvent(
-                "PRODUCT_DELETED",
+                ProductEvent.EventType.PRODUCT_DELETED,
                 existing.getId(),
                 user.getId(),
                 user.getEmail());

@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static com.buyapp.common.event.MediaEvent.EventType.*;
 
 @ExtendWith(MockitoExtension.class)
 class MediaEventProducerTest {
@@ -37,7 +38,7 @@ class MediaEventProducerTest {
         // Create event
         MediaEvent event = new MediaEvent();
         event.setMediaId("m-1");
-        event.setEventType("MEDIA_CREATED");
+        event.setEventType(IMAGE_UPLOADED);
 
         // Act
         producer.sendMediaEvent(event);
@@ -56,7 +57,7 @@ class MediaEventProducerTest {
 
         MediaEvent event = new MediaEvent();
         event.setMediaId("m-2");
-        event.setEventType("MEDIA_DELETED");
+        event.setEventType(IMAGE_DELETED);
 
         // Act: should not throw - error is logged
         producer.sendMediaEvent(event);

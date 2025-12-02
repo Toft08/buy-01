@@ -2,8 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CartItem } from '../../models/cart.model';
-import { Product } from '../../models/ecommerce.model';
+import { Media, Product } from '../../models/ecommerce.model';
 import { CartService } from '../../services/cart.service';
+import { MediaService } from '../../services/media.service';
 import { ProductService } from '../../services/product.service';
 
 @Component({
@@ -15,10 +16,15 @@ import { ProductService } from '../../services/product.service';
 })
 export class ProductListComponent implements OnInit {
   products: Product[] = [];
+  productMedia: Map<string, Media[]> = new Map();
   loading = true;
   error = '';
 
-  constructor(private productService: ProductService, private cartService: CartService) {}
+  constructor(
+    private productService: ProductService,
+    private cartService: CartService,
+    private mediaService: MediaService
+  ) {}
 
   ngOnInit(): void {
     this.loadProducts();
@@ -29,6 +35,12 @@ export class ProductListComponent implements OnInit {
       next: (products) => {
         this.products = products;
         this.loading = false;
+        // Load media for each product
+        products.forEach((product) => {
+          if (product.id) {
+            this.loadProductMedia(product.id);
+          }
+        });
       },
       error: (error) => {
         console.error('Error loading products:', error);
@@ -36,6 +48,30 @@ export class ProductListComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  loadProductMedia(productId: string): void {
+    this.mediaService.getMediaByProduct(productId).subscribe({
+      next: (media) => {
+        this.productMedia.set(productId, media);
+      },
+      error: (error) => {
+        console.error('Error loading media for product:', productId, error);
+      },
+    });
+  }
+
+  getProductImageUrl(productId: string): string {
+    const media = this.productMedia.get(productId);
+    if (media && media.length > 0) {
+      return this.mediaService.getMediaFile(media[0].id!);
+    }
+    return 'assets/images/placeholder.svg';
+  }
+
+  hasProductImage(productId: string): boolean {
+    const media = this.productMedia.get(productId);
+    return media !== undefined && media.length > 0;
   }
 
   addToCart(product: Product): void {

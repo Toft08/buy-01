@@ -32,9 +32,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Skip JWT processing for public endpoints
+        // Skip JWT processing for public endpoints (GET only)
         String requestPath = request.getRequestURI();
-        if (isPublicEndpoint(requestPath)) {
+        String method = request.getMethod();
+        if (isPublicEndpoint(requestPath, method)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -81,21 +82,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isPublicEndpoint(String path) {
-        // Auth endpoints
+    private boolean isPublicEndpoint(String path, String method) {
+        // Auth endpoints (any method)
         if (path.equals("/auth/login") || path.equals("/auth/register")) {
             return true;
         }
-        // Public media endpoints (viewing images)
+        
+        // Only GET requests can be public for the following endpoints
+        if (!"GET".equalsIgnoreCase(method)) {
+            return false;
+        }
+        
+        // Public media endpoints (viewing images) - GET only
         if (path.startsWith("/media/file/") || path.startsWith("/media/product/")) {
             return true;
         }
-        // Public product endpoints (browsing products)
+        // Public product endpoints (browsing products) - GET only
         if (path.equals("/products")) {
             return true;
         }
-        // Single product by ID (e.g., /products/abc123) - but NOT /products/my-products
-        // or /products/user/...
+        // Single product by ID (e.g., /products/abc123) - GET only
+        // but NOT /products/my-products or /products/user/...
         if (path.startsWith("/products/")) {
             String subPath = path.substring("/products/".length());
             // Only allow if it's a simple ID (no slashes, not "my-products", not "user")
@@ -103,7 +110,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return true;
             }
         }
-        // Actuator health checks
+        // Actuator health checks - GET only
         if (path.startsWith("/actuator/")) {
             return true;
         }

@@ -26,10 +26,15 @@ export class SellerDashboardComponent implements OnInit {
   successMessage = '';
   editingProductId: string | null = null;
 
+  // Two-step product creation
+  creationStep: 1 | 2 = 1;
+  newlyCreatedProductId: string | null = null;
+
   // Image upload
   selectedFiles: Map<string, File[]> = new Map();
   uploadingImages: Map<string, boolean> = new Map();
   imageError: Map<string, string> = new Map();
+  newProductImages: File[] = []; // For new product creation
   maxImagesPerProduct = 5;
   allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
   maxFileSize = 2 * 1024 * 1024; // 2MB
@@ -249,16 +254,118 @@ export class SellerDashboardComponent implements OnInit {
     this.productService.createProduct(this.newProduct).subscribe({
       next: (product) => {
         this.myProducts.unshift(product);
-        this.successMessage = 'Product created successfully!';
-        this.resetForm();
-        this.showAddForm = false;
         this.submitting = false;
+
+        // Move to step 2: Image upload
+        if (product.id) {
+          this.newlyCreatedProductId = product.id;
+          this.productMedia.set(product.id, []);
+          this.creationStep = 2;
+          this.successMessage = 'Product created! Now add images (optional).';
+        } else {
+          this.finishProductCreation();
+        }
       },
       error: (error) => {
         console.error('Error creating product:', error);
         this.formError = error.error?.message || 'Failed to create product. Please try again.';
         this.submitting = false;
       },
+    });
+  }
+
+  finishProductCreation(): void {
+    this.successMessage = 'Product created successfully!';
+    this.resetForm();
+    this.showAddForm = false;
+    this.creationStep = 1;
+    this.newlyCreatedProductId = null;
+    this.newProductImages = [];
+    setTimeout(() => (this.successMessage = ''), 3000);
+  }
+
+  skipImageUpload(): void {
+    this.finishProductCreation();
+  }
+
+  onNewProductFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const files = Array.from(input.files);
+    this.formError = '';
+
+    // Validate files
+    const validFiles: File[] = [];
+    for (const file of files) {
+      if (!this.allowedTypes.includes(file.type)) {
+        this.formError = `Invalid file type: ${file.name}. Only PNG, JPG, GIF, and WebP are allowed.`;
+        input.value = '';
+        return;
+      }
+      if (file.size > this.maxFileSize) {
+        this.formError = `File too large: ${file.name}. Maximum size is 2MB.`;
+        input.value = '';
+        return;
+      }
+      validFiles.push(file);
+    }
+
+    const currentCount = this.newProductImages.length;
+    if (currentCount + validFiles.length > this.maxImagesPerProduct) {
+      this.formError = `Can only add ${
+        this.maxImagesPerProduct - currentCount
+      } more image(s). Maximum is ${this.maxImagesPerProduct} per product.`;
+      input.value = '';
+      return;
+    }
+
+    this.newProductImages = [...this.newProductImages, ...validFiles];
+    input.value = '';
+  }
+
+  removeNewProductImage(index: number): void {
+    this.newProductImages.splice(index, 1);
+  }
+
+  uploadNewProductImages(): void {
+    if (!this.newlyCreatedProductId || this.newProductImages.length === 0) {
+      this.finishProductCreation();
+      return;
+    }
+
+    this.submitting = true;
+    this.formError = '';
+
+    let uploaded = 0;
+    const total = this.newProductImages.length;
+    const productId = this.newlyCreatedProductId;
+
+    this.newProductImages.forEach((file) => {
+      this.mediaService.uploadMedia(file, productId).subscribe({
+        next: (media) => {
+          uploaded++;
+          const currentMedia = this.productMedia.get(productId) || [];
+          currentMedia.push(media);
+          this.productMedia.set(productId, currentMedia);
+
+          if (uploaded === total) {
+            this.submitting = false;
+            this.successMessage = `Product created with ${total} image(s)!`;
+            this.resetForm();
+            this.showAddForm = false;
+            this.creationStep = 1;
+            this.newlyCreatedProductId = null;
+            this.newProductImages = [];
+            setTimeout(() => (this.successMessage = ''), 3000);
+          }
+        },
+        error: (error) => {
+          console.error('Error uploading image:', error);
+          this.formError = error.error?.message || 'Failed to upload some images.';
+          this.submitting = false;
+        },
+      });
     });
   }
 
@@ -346,6 +453,9 @@ export class SellerDashboardComponent implements OnInit {
       quality: 0,
     };
     this.formError = '';
+    this.creationStep = 1;
+    this.newlyCreatedProductId = null;
+    this.newProductImages = [];
   }
 
   resetEditForm(): void {

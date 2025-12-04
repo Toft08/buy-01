@@ -15,9 +15,7 @@
       </div>
 
       <div *ngIf="isLoggedIn() && currentUser" class="nav-user">
-        <a routerLink="/seller/dashboard" class="nav-link" *ngIf="isSeller()">
-          Manage Products
-        </a>
+        <a routerLink="/seller/dashboard" class="nav-link" *ngIf="isSeller()"> Manage Products </a>
 
         <div class="user-dropdown">
           <button class="user-menu-toggle" (click)="toggleDropdown()">
@@ -44,4 +42,3 @@
     </div>
   </div>
 </nav>
-

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { User } from '../../models/ecommerce.model';
 import { AuthService } from '../../services/auth.service';
@@ -20,8 +20,17 @@ export class NavbarComponent implements OnInit {
   constructor(
     private readonly authService: AuthService,
     private readonly mediaService: MediaService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly elementRef: ElementRef
   ) {}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Close dropdown if click is outside the navbar component
+    if (this.dropdownOpen && !this.elementRef.nativeElement.contains(event.target)) {
+      this.dropdownOpen = false;
+    }
+  }
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe((user) => {

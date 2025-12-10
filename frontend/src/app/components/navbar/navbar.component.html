@@ -1,0 +1,44 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <a routerLink="/" class="navbar-logo">
+      <span class="logo-icon">🛒</span>
+      Buy-01
+    </a>
+
+    <div class="navbar-menu">
+      <a routerLink="/" class="nav-link">Home</a>
+      <a routerLink="/products" class="nav-link">Products</a>
+
+      <div *ngIf="!isLoggedIn()" class="nav-auth">
+        <a routerLink="/login" class="nav-link">Sign In</a>
+        <a routerLink="/register" class="nav-link nav-register">Sign Up</a>
+      </div>
+
+      <div *ngIf="isLoggedIn() && currentUser" class="nav-user">
+        <a routerLink="/seller/dashboard" class="nav-link" *ngIf="isSeller()"> Manage Products </a>
+
+        <div class="user-dropdown">
+          <button class="user-menu-toggle" (click)="toggleDropdown()">
+            <span class="user-avatar" *ngIf="avatarUrl">
+              <img [src]="avatarUrl" alt="Avatar" class="avatar-img" />
+            </span>
+            <span class="user-avatar-placeholder" *ngIf="!avatarUrl">{{ getInitials() }}</span>
+            <span class="user-greeting">Hello, {{ currentUser.name }}</span>
+            <span class="dropdown-icon" [class.open]="dropdownOpen">▼</span>
+          </button>
+
+          <div class="dropdown-menu" *ngIf="dropdownOpen">
+            <a routerLink="/profile" class="dropdown-item" (click)="closeDropdown()">
+              👤 My Profile
+            </a>
+            <a routerLink="/profile" class="dropdown-item" (click)="closeDropdown()">
+              🛍️ My Cart
+            </a>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item logout" (click)="logout()">🚪 Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

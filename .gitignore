@@ -28,3 +28,7 @@ replay_pid*
 # Service PIDs and logs
 .service-pids
 logs/
+
+# Uploaded files (avatars, product images)
+uploads/
+**/uploads/

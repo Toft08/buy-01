@@ -1,0 +1,50 @@
+<div class="image-slider" [class.has-multiple]="images.length > 1">
+  <!-- Main Image -->
+  <div class="slider-container">
+    <img
+      *ngIf="images.length > 0"
+      [src]="images[currentIndex]"
+      [alt]="alt + ' ' + (currentIndex + 1)"
+      class="slider-image"
+    />
+    <div *ngIf="images.length === 0" class="no-image">
+      <span class="no-image-icon">📷</span>
+      <span>No images</span>
+    </div>
+
+    <!-- Navigation Arrows -->
+    <button
+      *ngIf="images.length > 1"
+      class="nav-arrow nav-prev"
+      (click)="prevImage($event)"
+      [attr.aria-label]="'Previous image'"
+    >
+      ‹
+    </button>
+    <button
+      *ngIf="images.length > 1"
+      class="nav-arrow nav-next"
+      (click)="nextImage($event)"
+      [attr.aria-label]="'Next image'"
+    >
+      ›
+    </button>
+  </div>
+
+  <!-- Dots Indicator -->
+  <div *ngIf="images.length > 1 && showDots" class="slider-dots">
+    <button
+      *ngFor="let img of images; let i = index"
+      class="dot"
+      [class.active]="i === currentIndex"
+      (click)="goToImage(i, $event)"
+      [attr.aria-label]="'Go to image ' + (i + 1)"
+    ></button>
+  </div>
+
+  <!-- Image Counter -->
+  <div *ngIf="images.length > 1 && showCounter" class="image-counter">
+    {{ currentIndex + 1 }} / {{ images.length }}
+  </div>
+</div>
+

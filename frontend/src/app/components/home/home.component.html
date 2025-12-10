@@ -1,0 +1,60 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome to Buy-01 Marketplace</h1>
+      <p class="hero-subtitle">Discover amazing products from sellers around the world</p>
+
+      <div *ngIf="!isLoggedIn()" class="hero-actions">
+        <a routerLink="/register" class="btn btn-primary">Join as Seller</a>
+        <a routerLink="/login" class="btn btn-secondary">Sign In</a>
+      </div>
+
+      <div *ngIf="isLoggedIn() && currentUser" class="welcome-back">
+        <h2>Welcome back, {{ currentUser.name }}!</h2>
+        <div class="user-actions">
+          <a *ngIf="isSeller()" routerLink="/seller/dashboard" class="btn btn-primary">
+            Manage Products
+          </a>
+          <a routerLink="/products" class="btn btn-secondary">Browse Products</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="featured-products">
+    <h2>Featured Products</h2>
+    <div *ngIf="isLoading" class="loading">Loading products...</div>
+
+    <div *ngIf="!isLoading" class="products-grid">
+      <div *ngFor="let product of featuredProducts" class="product-card">
+        <div class="product-image">
+          <app-image-slider
+            [images]="getProductImages(product.id!)"
+            [alt]="product.name"
+            [showDots]="true"
+          ></app-image-slider>
+        </div>
+        <div class="product-info">
+          <h3>{{ product.name }}</h3>
+          <p class="product-description">{{ product.description }}</p>
+          <div class="product-details">
+            <span class="price">${{ product.price }}</span>
+            <span class="quality">Quality: {{ product.quality }}%</span>
+          </div>
+          <p class="seller">Sold by: {{ product.user }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="featuredProducts.length === 0 && !isLoading" class="no-products">
+      <p>No products available yet. Be the first to <a routerLink="/register">sell something</a>!</p>
+    </div>
+
+    <div class="view-all">
+      <a routerLink="/products" class="btn btn-outline">View All Products</a>
+    </div>
+  </section>
+</div>
+

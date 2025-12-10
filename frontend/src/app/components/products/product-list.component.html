@@ -7,7 +7,13 @@
 
   <div class="products-grid">
     <div *ngFor="let product of products" class="product-card">
-      <img class="card-image" src="assets/images/placeholder.jpg" [alt]="product.name" />
+      <div class="card-image-container">
+        <app-image-slider
+          [images]="getProductImageUrls(product.id!)"
+          [alt]="product.name"
+          [showDots]="true"
+        ></app-image-slider>
+      </div>
       <div class="card-content">
         <h3 class="card-title">{{ product.name }}</h3>
         <p class="card-description">{{ product.description }}</p>

@@ -120,6 +120,18 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    /**
+     * Update user's avatar reference (called by Media Service)
+     */
+    public void updateUserAvatar(String userId, String avatarId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        // Set avatar to null if empty string is passed
+        user.setAvatar(avatarId != null && !avatarId.isEmpty() ? avatarId : null);
+        userRepository.save(user);
+    }
+
     // Helper methods
     private UserDto toDto(User user) {
         UserDto dto = new UserDto();

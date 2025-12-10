@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/media/file/**", "/actuator/**").permitAll() // Public file serving
                         .requestMatchers("/media/product/**").permitAll() // Public product media listing
+                        .requestMatchers("/media/avatar/file/**", "/media/avatar/user/**").permitAll() // Public avatar viewing
                         .requestMatchers("/media/internal/**").permitAll() // Internal service calls
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

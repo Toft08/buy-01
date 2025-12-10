@@ -1,0 +1,258 @@
+@use '../../../styles/variables' as *;
+
+.navbar {
+  background-color: $bg-card;
+  box-shadow: $shadow-sm;
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+}
+
+.navbar-container {
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $primary-color;
+  text-decoration: none;
+  transition: color $transition-normal;
+
+  &:hover {
+    color: $primary-dark;
+  }
+
+  .logo-icon {
+    font-size: 1.75rem;
+  }
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.nav-link {
+  color: $text-primary;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color $transition-normal;
+  cursor: pointer;
+
+  &:hover {
+    color: $primary-color;
+  }
+}
+
+.nav-auth {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+}
+
+.nav-register {
+  background-color: $primary-color;
+  color: white;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-pill;
+
+  &:hover {
+    background-color: $primary-dark;
+    color: white;
+  }
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.user-dropdown {
+  position: relative;
+}
+
+.user-menu-toggle {
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: $text-primary;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-pill;
+  transition: all $transition-normal;
+
+  &:hover {
+    background-color: rgba($primary-color, 0.08);
+    border-color: rgba($primary-color, 0.2);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-circle;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-circle;
+  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.user-greeting {
+  font-weight: 600;
+  color: $primary-color;
+}
+
+.dropdown-icon {
+  font-size: 0.625rem;
+  transition: transform $transition-normal;
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background-color: $bg-card;
+  border: none;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-xl;
+  min-width: 220px;
+  z-index: $z-dropdown;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.2s ease-out;
+
+  // Subtle top accent line matching primary color
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $primary-color, $primary-dark);
+  }
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  width: 100%;
+  padding: $spacing-md $spacing-lg;
+  text-align: left;
+  color: $text-primary;
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all $transition-fast;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  &:hover {
+    background-color: rgba($primary-color, 0.08);
+    border-left-color: $primary-color;
+    color: $primary-color;
+  }
+
+  &:first-child {
+    padding-top: $spacing-lg;
+  }
+
+  &.logout {
+    color: $danger-color;
+    margin-top: $spacing-xs;
+
+    &:hover {
+      background-color: rgba($danger-color, 0.08);
+      border-left-color: $danger-color;
+    }
+  }
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, $border-color, transparent);
+  margin: $spacing-sm $spacing-md;
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .navbar-container {
+    flex-wrap: wrap;
+    height: auto;
+    padding: $spacing-md $spacing-lg;
+  }
+
+  .navbar-menu {
+    gap: $spacing-md;
+    flex-basis: 100%;
+    margin-top: $spacing-md;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .user-greeting {
+    display: none;
+  }
+
+  .user-menu-toggle {
+    padding: $spacing-sm;
+  }
+}
+

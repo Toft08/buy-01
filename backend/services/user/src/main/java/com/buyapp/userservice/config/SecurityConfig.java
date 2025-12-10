@@ -29,7 +29,9 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable) // CORS handled by Gateway
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/actuator/**", "/users/{id}", "/users/email/{email}").permitAll()
+                        .requestMatchers("/auth/**", "/actuator/**", "/users/{id}", "/users/email/{email}",
+                                "/users/internal/**") // Internal endpoints for service-to-service calls
+                        .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

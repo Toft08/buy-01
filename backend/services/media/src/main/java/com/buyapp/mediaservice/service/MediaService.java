@@ -37,6 +37,7 @@ public class MediaService {
 
     private static final String UPLOAD_DIR = "uploads/images/";
     private static final long MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+    private static final int MAX_IMAGES_PER_PRODUCT = 5;
     private static final String[] ALLOWED_CONTENT_TYPES = {
             "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"
     };
@@ -75,6 +76,12 @@ public class MediaService {
 
         if (!product.getUser().equals(userEmail) && !isAdmin) {
             throw new ForbiddenException("You can only upload media for your own products");
+        }
+
+        // Check if product already has maximum number of images
+        long currentImageCount = mediaRepository.countByProductId(productId);
+        if (currentImageCount >= MAX_IMAGES_PER_PRODUCT) {
+            throw new BadRequestException("Maximum of " + MAX_IMAGES_PER_PRODUCT + " images per product allowed");
         }
 
         try {

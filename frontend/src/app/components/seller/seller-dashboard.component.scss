@@ -31,6 +31,172 @@
     margin-bottom: $spacing-xl;
     color: $text-primary;
   }
+
+  .step-description {
+    color: $text-secondary;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+// Step Indicator
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-2xl;
+  padding: $spacing-md 0;
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: $radius-circle;
+      background: $bg-light;
+      color: $text-muted;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border: 2px solid $border-color;
+      transition: all $transition-fast;
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      color: $text-muted;
+      font-weight: 500;
+      transition: color $transition-fast;
+    }
+
+    &.active {
+      .step-number {
+        background: $primary-color;
+        color: white;
+        border-color: $primary-color;
+      }
+
+      .step-label {
+        color: $primary-color;
+      }
+    }
+
+    &.completed {
+      .step-number {
+        background: $success-color;
+        color: white;
+        border-color: $success-color;
+      }
+
+      .step-label {
+        color: $success-color;
+      }
+    }
+  }
+
+  .step-line {
+    width: 60px;
+    height: 2px;
+    background: $border-color;
+    margin: 0 $spacing-md;
+    margin-bottom: 20px;
+    transition: background $transition-fast;
+
+    &.active {
+      background: $primary-color;
+    }
+  }
+}
+
+// New Product Images (Step 2)
+.new-product-images {
+  margin-bottom: $spacing-lg;
+
+  .image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: $spacing-md;
+    margin-bottom: $spacing-sm;
+  }
+
+  .image-preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: $radius-md;
+    overflow: hidden;
+    background: $bg-light;
+    border: 2px dashed $border-color;
+
+    .preview-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: $spacing-sm;
+      font-size: 0.7rem;
+      color: $text-muted;
+      text-align: center;
+      word-break: break-all;
+    }
+
+    .image-delete-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: $radius-circle;
+      background: rgba($danger-color, 0.9);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: $danger-dark;
+      }
+    }
+  }
+
+  .image-count-info {
+    font-size: 0.875rem;
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+// Form actions with space-between
+.form-actions-between {
+  justify-content: space-between !important;
+}
+
+// Edit Product Form
+.edit-product-form {
+  @include card-base();
+  padding: $spacing-xl;
+  margin-bottom: $spacing-2xl;
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: $spacing-xl;
+    color: $text-primary;
+  }
+}
+
+// Products Grid
+.products-grid {
+  @include responsive-grid(3, $spacing-xl);
+  margin-top: $spacing-xl;
 }
 
 // Product Actions in Cards
@@ -39,6 +205,162 @@
     display: flex;
     gap: $spacing-sm;
     margin-top: $spacing-md;
+  }
+}
+
+// Product Images Section
+.product-images {
+  margin-bottom: $spacing-md;
+
+  .images-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: $spacing-sm;
+  }
+
+  .image-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: $radius-md;
+    overflow: hidden;
+    box-shadow: $shadow-sm;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform $transition-fast;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+    }
+
+    .image-delete-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: $radius-circle;
+      background: rgba($danger-color, 0.9);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity $transition-fast;
+
+      &:hover {
+        background: $danger-dark;
+      }
+    }
+
+    &:hover .image-delete-btn {
+      opacity: 1;
+    }
+  }
+
+  .no-images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-lg;
+    background: $bg-light;
+    border-radius: $radius-md;
+    color: $text-muted;
+    font-size: 0.875rem;
+
+    .no-images-icon {
+      font-size: 2rem;
+      margin-bottom: $spacing-xs;
+      opacity: 0.5;
+    }
+  }
+}
+
+// Image Upload Section
+.image-upload-section {
+  padding: $spacing-md;
+  background: $bg-light;
+  border-radius: $radius-md;
+  margin-top: $spacing-md;
+
+  .upload-info {
+    margin-bottom: $spacing-sm;
+
+    .image-count {
+      font-size: 0.875rem;
+      color: $text-secondary;
+      font-weight: 500;
+    }
+  }
+
+  .upload-controls {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  .file-input-label {
+    display: inline-block;
+    cursor: pointer;
+
+    input[type='file'] {
+      display: none;
+    }
+
+    .btn-upload {
+      display: inline-block;
+      padding: 8px 16px;
+      background: $primary-color;
+      color: white;
+      border-radius: $radius-md;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background $transition-fast;
+
+      &:hover {
+        background: $primary-dark;
+      }
+    }
+  }
+
+  .selected-files {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+    padding: $spacing-sm;
+    background: white;
+    border-radius: $radius-sm;
+    font-size: 0.875rem;
+    color: $text-secondary;
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+  }
+
+  .upload-limit-reached {
+    font-size: 0.875rem;
+    color: $text-muted;
+    font-style: italic;
+  }
+
+  .image-error {
+    margin-top: $spacing-sm;
+    padding: $spacing-sm;
+    background: rgba($danger-color, 0.1);
+    border-radius: $radius-sm;
+    color: $danger-color;
+    font-size: 0.875rem;
   }
 }
 

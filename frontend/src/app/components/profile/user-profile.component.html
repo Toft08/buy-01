@@ -2,7 +2,36 @@
   <!-- Header with User Info -->
   <div class="profile-header">
     <div class="user-info">
-      <div class="avatar">{{ getInitials() }}</div>
+      <div class="avatar-section">
+        <div class="avatar" *ngIf="!avatarUrl">{{ getInitials() }}</div>
+        <img *ngIf="avatarUrl" [src]="avatarUrl" alt="Profile avatar" class="avatar-image" />
+        <div class="avatar-actions" *ngIf="isSeller()">
+          <input
+            type="file"
+            #avatarFileInput
+            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+            (change)="onAvatarFileSelected($event)"
+            class="file-input-hidden"
+          />
+          <button
+            class="btn-avatar-action"
+            (click)="avatarFileInput.click()"
+            [disabled]="isUploadingAvatar"
+          >
+            {{ avatarUrl ? '📷' : '➕' }}
+          </button>
+          <button
+            *ngIf="avatarUrl"
+            class="btn-avatar-action btn-delete"
+            (click)="deleteAvatar()"
+            [disabled]="isUploadingAvatar"
+          >
+            🗑️
+          </button>
+        </div>
+        <div *ngIf="isUploadingAvatar" class="avatar-loading">Uploading...</div>
+        <div *ngIf="avatarError" class="avatar-error">{{ avatarError }}</div>
+      </div>
       <div class="user-details">
         <h1>{{ currentUser?.name }}</h1>
         <p class="email">{{ currentUser?.email }}</p>
@@ -30,13 +59,12 @@
     <div *ngIf="!isLoading && sellerProducts.length > 0" class="products-grid">
       <div *ngFor="let product of sellerProducts" class="product-card">
         <div class="product-image">
-          <img
-            *ngIf="getProductImage(product.id!)"
-            [src]="getProductImage(product.id!)"
+          <app-image-slider
+            *ngIf="getProductImages(product.id!).length > 0"
+            [images]="getProductImages(product.id!)"
             [alt]="product.name"
-            class="product-img"
-          />
-          <div *ngIf="!getProductImage(product.id!)" class="no-image">No Image</div>
+          ></app-image-slider>
+          <div *ngIf="getProductImages(product.id!).length === 0" class="no-image">No Image</div>
         </div>
         <div class="product-info">
           <h3>{{ product.name }}</h3>

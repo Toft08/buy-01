@@ -1,0 +1,123 @@
+@use '../../../../styles/variables' as *;
+
+.image-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.slider-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.no-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: $bg-light;
+  color: $text-light;
+  font-size: 0.875rem;
+  gap: $spacing-sm;
+}
+
+.no-image-icon {
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+// Navigation Arrows
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-circle;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  color: $text-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity $transition-fast, background $transition-fast;
+  z-index: 2;
+  box-shadow: $shadow-md;
+
+  &:hover {
+    background: white;
+  }
+}
+
+.image-slider:hover .nav-arrow,
+.image-slider.has-multiple:focus-within .nav-arrow {
+  opacity: 1;
+}
+
+.nav-prev {
+  left: $spacing-sm;
+}
+
+.nav-next {
+  right: $spacing-sm;
+}
+
+// Dots Indicator
+.slider-dots {
+  position: absolute;
+  bottom: $spacing-sm;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: $radius-circle;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background $transition-fast, transform $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  &.active {
+    background: white;
+    transform: scale(1.2);
+  }
+}
+
+// Image Counter
+.image-counter {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 4px $spacing-sm;
+  border-radius: $radius-lg;
+  font-size: 0.75rem;
+  z-index: 2;
+}

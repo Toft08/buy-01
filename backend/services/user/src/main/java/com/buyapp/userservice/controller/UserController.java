@@ -83,4 +83,13 @@ public class UserController {
         UserDto user = userService.getUserByEmail(email);
         userService.deleteUser(user.getId(), userDetails);
     }
+
+    /**
+     * Internal endpoint for Media Service to update user's avatar field
+     * Path: /users/internal/avatar/{id}
+     */
+    @PutMapping(value = "/internal/avatar/{id}", consumes = org.springframework.http.MediaType.TEXT_PLAIN_VALUE)
+    public void updateUserAvatar(@PathVariable String id, @RequestBody(required = false) String avatarId) {
+        userService.updateUserAvatar(id, avatarId);
+    }
 }

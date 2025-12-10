@@ -1,0 +1,130 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Create Account</h2>
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="auth-form">
+      <div class="form-group">
+        <label for="name">Full Name:</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          [(ngModel)]="userData.name"
+          required
+          minlength="2"
+          maxlength="50"
+          #name="ngModel"
+          class="form-control"
+          [class.error]="name.invalid && name.touched"
+        />
+        <div *ngIf="name.invalid && name.touched" class="error-message">
+          <span *ngIf="name.errors?.['required']">Name is required</span>
+          <span *ngIf="name.errors?.['minlength']">Name must be at least 2 characters</span>
+          <span *ngIf="name.errors?.['maxlength']">Name cannot exceed 50 characters</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="userData.email"
+          required
+          email
+          #email="ngModel"
+          class="form-control"
+          [class.error]="email.invalid && email.touched"
+        />
+        <div *ngIf="email.invalid && email.touched" class="error-message">
+          <span *ngIf="email.errors?.['required']">Email is required</span>
+          <span *ngIf="email.errors?.['email']">Please enter a valid email</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="userData.password"
+          required
+          minlength="3"
+          #password="ngModel"
+          class="form-control"
+          [class.error]="password.invalid && password.touched"
+        />
+        <div *ngIf="password.invalid && password.touched" class="error-message">
+          <span *ngIf="password.errors?.['required']">Password is required</span>
+          <span *ngIf="password.errors?.['minlength']">Password must be at least 3 characters</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Account Type:</label>
+        <select
+          id="role"
+          name="role"
+          [(ngModel)]="userData.role"
+          required
+          #role="ngModel"
+          class="form-control"
+          [class.error]="role.invalid && role.touched"
+        >
+          <option value="">Select account type</option>
+          <option value="client">Client (Buy products)</option>
+          <option value="seller">Seller (Sell products)</option>
+        </select>
+        <div *ngIf="role.invalid && role.touched" class="error-message">
+          <span *ngIf="role.errors?.['required']">Please select an account type</span>
+        </div>
+      </div>
+
+      <!-- Avatar upload section for sellers -->
+      <div *ngIf="userData.role === 'seller'" class="form-group avatar-section">
+        <label>Profile Avatar (Optional):</label>
+        <div class="avatar-upload-area">
+          <div class="avatar-preview" *ngIf="avatarPreview">
+            <img [src]="avatarPreview" alt="Avatar preview" class="preview-image" />
+            <button type="button" class="remove-avatar" (click)="removeAvatar()">×</button>
+          </div>
+          <div class="avatar-placeholder" *ngIf="!avatarPreview">
+            <span class="placeholder-icon">📷</span>
+            <span class="placeholder-text">Upload your photo</span>
+          </div>
+          <input
+            type="file"
+            id="avatar"
+            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+            (change)="onAvatarSelected($event)"
+            class="file-input"
+            #avatarInput
+          />
+          <button type="button" class="btn btn-secondary btn-upload" (click)="avatarInput.click()">
+            {{ avatarPreview ? 'Change Photo' : 'Choose Photo' }}
+          </button>
+        </div>
+        <small class="form-hint">Max 2MB. Formats: JPG, PNG, GIF, WebP</small>
+        <div *ngIf="avatarError" class="error-message">{{ avatarError }}</div>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="registerForm.invalid || isLoading"
+      >
+        {{ isLoading ? 'Creating Account...' : 'Create Account' }}
+      </button>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+    </form>
+
+    <p class="auth-link">
+      Already have an account? <a routerLink="/login">Sign in here</a>
+    </p>
+  </div>
+</div>
+

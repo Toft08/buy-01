@@ -25,6 +25,15 @@ export interface Media {
   fileSize: number;
 }
 
+export interface Avatar {
+  id?: string;
+  imagePath: string;
+  userId: string;
+  fileName: string;
+  contentType: string;
+  fileSize: number;
+}
+
 export interface AuthResponse {
   token: string;
   user: User;

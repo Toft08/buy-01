@@ -1,0 +1,242 @@
+@use '../../../styles/variables' as *;
+
+.home-container {
+  min-height: 100vh;
+}
+
+// Hero Section
+.hero {
+  background: linear-gradient(135deg, $secondary-color 0%, $secondary-dark 100%);
+  color: white;
+  padding: $spacing-3xl $spacing-lg;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  margin-bottom: $spacing-lg;
+  font-weight: 700;
+}
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  margin-bottom: $spacing-2xl;
+  opacity: 0.9;
+}
+
+.hero-actions {
+  display: flex;
+  gap: $spacing-lg;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.welcome-back {
+  margin-top: $spacing-lg;
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.user-actions {
+  display: flex;
+  gap: $spacing-md;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+// Buttons
+.btn {
+  padding: $spacing-sm $spacing-xl;
+  border-radius: $radius-pill;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all $transition-normal;
+  border: 2px solid transparent;
+  display: inline-block;
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  color: white;
+
+  &:hover {
+    background-color: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: white;
+  border-color: white;
+
+  &:hover {
+    background-color: white;
+    color: $secondary-color;
+  }
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: $secondary-color;
+  border-color: $secondary-color;
+
+  &:hover {
+    background-color: $secondary-color;
+    color: white;
+  }
+}
+
+// Featured Products Section
+.featured-products {
+  padding: $spacing-3xl $spacing-lg;
+  max-width: $container-max-width;
+  margin: 0 auto;
+
+  h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: $spacing-2xl;
+    color: $text-primary;
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: $spacing-2xl;
+  font-size: 1.2rem;
+  color: $text-secondary;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: $spacing-xl;
+  margin-bottom: $spacing-2xl;
+}
+
+.product-card {
+  background: $bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+  transition: transform $transition-normal, box-shadow $transition-normal;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $shadow-xl;
+  }
+}
+
+.product-image {
+  height: 200px;
+  background-color: $bg-light;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: $text-light;
+  font-size: 1.1rem;
+}
+
+.product-info {
+  padding: $spacing-lg;
+
+  h3 {
+    font-size: 1.3rem;
+    margin-bottom: $spacing-sm;
+    color: $text-primary;
+  }
+}
+
+.product-description {
+  color: $text-secondary;
+  margin-bottom: $spacing-md;
+  line-height: 1.4;
+}
+
+.product-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $primary-color;
+}
+
+.quality {
+  background-color: #e3f2fd;
+  color: $info-dark;
+  padding: 4px $spacing-sm;
+  border-radius: $radius-lg;
+  font-size: 0.9rem;
+}
+
+.seller {
+  color: $text-muted;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.no-products {
+  text-align: center;
+  padding: $spacing-3xl $spacing-lg;
+  color: $text-secondary;
+  font-size: 1.1rem;
+
+  a {
+    color: $primary-color;
+    text-decoration: none;
+    font-weight: 600;
+  }
+}
+
+.view-all {
+  text-align: center;
+  margin-top: $spacing-xl;
+}
+
+// Responsive
+@media (max-width: $breakpoint-tablet) {
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+  }
+}
+

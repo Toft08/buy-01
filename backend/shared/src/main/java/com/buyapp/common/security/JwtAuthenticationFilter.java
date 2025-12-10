@@ -32,10 +32,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Skip JWT processing for public endpoints
+        // Skip JWT processing for public endpoints (GET only)
         String requestPath = request.getRequestURI();
-        if (requestPath.equals("/auth/login") ||
-                requestPath.equals("/auth/register")) {
+        String method = request.getMethod();
+        if (isPublicEndpoint(requestPath, method)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -80,5 +80,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isPublicEndpoint(String path, String method) {
+        // Auth endpoints (any method)
+        if (path.equals("/auth/login") || path.equals("/auth/register")) {
+            return true;
+        }
+        
+        // Only GET requests can be public for the following endpoints
+        if (!"GET".equalsIgnoreCase(method)) {
+            return false;
+        }
+        
+        // Public media endpoints (viewing images and avatars) - GET only
+        if (path.startsWith("/media/file/") || path.startsWith("/media/product/") ||
+            path.startsWith("/media/avatar/file/") || path.startsWith("/media/avatar/user/")) {
+            return true;
+        }
+        // Public product endpoints (browsing products) - GET only
+        if (path.equals("/products")) {
+            return true;
+        }
+        // Single product by ID (e.g., /products/abc123) - GET only
+        // but NOT /products/my-products or /products/user/...
+        if (path.startsWith("/products/")) {
+            String subPath = path.substring("/products/".length());
+            // Only allow if it's a simple ID (no slashes, not "my-products", not "user")
+            if (!subPath.contains("/") && !subPath.equals("my-products") && !subPath.startsWith("user")) {
+                return true;
+            }
+        }
+        // Actuator health checks - GET only
+        if (path.startsWith("/actuator/")) {
+            return true;
+        }
+        return false;
     }
 }

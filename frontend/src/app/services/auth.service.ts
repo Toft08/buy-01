@@ -54,7 +54,6 @@ export class AuthService {
       )
       .pipe(
         tap(() => {
-          console.log('Logout response received, clearing user data');
           this.clearCurrentUser();
         })
       );
@@ -84,6 +83,18 @@ export class AuthService {
       Authorization: token ? `Bearer ${token}` : '',
       'Content-Type': 'application/json',
     });
+  }
+
+  /**
+   * Update the current user's data (e.g., after avatar upload)
+   */
+  updateCurrentUser(updates: Partial<User>): void {
+    const currentUser = this.currentUserSubject.value;
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...updates };
+      this.currentUserSubject.next(updatedUser);
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    }
   }
 
   private setCurrentUser(user: User): void {

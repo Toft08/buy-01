@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # -------------------
   # Kafka (KRaft mode - no Zookeeper needed)
@@ -31,7 +29,7 @@ services:
     image: mongo:latest
     container_name: buyapp-mongodb
     ports:
-      - "27017:27017"
+      - '27017:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
@@ -40,7 +38,17 @@ services:
     networks:
       - buy-01-network
     healthcheck:
-      test: [ "CMD", "mongosh", "--username", "admin", "--password", "password", "--eval", "db.adminCommand('ping')" ]
+      test:
+        [
+          'CMD',
+          'mongosh',
+          '--username',
+          'admin',
+          '--password',
+          'password',
+          '--eval',
+          "db.adminCommand('ping')",
+        ]
       interval: 5s
       timeout: 2s
       retries: 10
@@ -52,11 +60,11 @@ services:
     build: ./backend/services/eureka
     container_name: buyapp-eureka-server
     ports:
-      - "8761:8761"
+      - '8761:8761'
     networks:
       - buy-01-network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8761/actuator/health']
       interval: 5s
       timeout: 2s
       retries: 10
@@ -67,7 +75,7 @@ services:
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
     ports:
-      - "8080:8080"
+      - '8080:8080'
     networks:
       - buy-01-network
     depends_on:
@@ -81,7 +89,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     expose:
-      - "8081"
+      - '8081'
     networks:
       - buy-01-network
     depends_on:
@@ -97,7 +105,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     expose:
-      - "8082"
+      - '8082'
     networks:
       - buy-01-network
     depends_on:
@@ -113,7 +121,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     expose:
-      - "8083"
+      - '8083'
     networks:
       - buy-01-network
     volumes:
@@ -131,7 +139,7 @@ services:
     build: ./frontend
     container_name: buyapp-frontend
     ports:
-      - "4200:80"
+      - '4200:80'
     networks:
       - buy-01-network
     depends_on:
@@ -142,7 +150,6 @@ services:
 # -------------------
 networks:
   buy-01-network:
-
 
 volumes:
   mongodb_data:

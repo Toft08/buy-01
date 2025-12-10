@@ -86,6 +86,8 @@ services:
     build: ./backend/services/user
     container_name: buyapp-user-service
     environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
       SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     expose:
@@ -102,6 +104,8 @@ services:
     build: ./backend/services/product
     container_name: buyapp-product-service
     environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
       SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     expose:
@@ -118,6 +122,8 @@ services:
     build: ./backend/services/media
     container_name: buyapp-media-service
     environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
       SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     expose:

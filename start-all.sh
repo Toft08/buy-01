@@ -59,9 +59,9 @@ wait_for_eureka() {
     return 1
 }
 
-# Start Docker Compose for MongoDB, Zookeeper, and Kafka
-echo -e "${YELLOW}🐳 Starting Docker infrastructure (MongoDB, Zookeeper, Kafka)...${NC}"
-if docker-compose up -d mongodb zookeeper kafka; then
+# Start Docker Compose for MongoDB and Kafka
+echo -e "${YELLOW}🐳 Starting Docker infrastructure (MongoDB, Kafka)...${NC}"
+if docker-compose up -d mongodb kafka; then
     echo -e "${GREEN}✅ Docker infrastructure started${NC}"
     echo -e "${BLUE} Waiting for services to be healthy...${NC}"
     sleep 10

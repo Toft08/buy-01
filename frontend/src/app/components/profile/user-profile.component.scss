@@ -381,3 +381,58 @@
   padding: 40px;
   color: #999;
 }
+
+// Coming Soon Section
+.coming-soon-section {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border: 2px dashed #dee2e6;
+}
+
+.coming-soon-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.coming-soon-section h3 {
+  color: #495057;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.coming-soon-section p {
+  color: #6c757d;
+  max-width: 500px;
+  margin: 0 auto 30px;
+  line-height: 1.6;
+}
+
+.coming-soon-features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.coming-soon-features .feature {
+  background: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 14px;
+  color: #28a745;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}

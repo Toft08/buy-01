@@ -79,6 +79,7 @@ export class ProductListComponent implements OnInit {
     };
 
     this.cartService.addToCart(cartItem);
-    console.log(`${product.name} added to cart!`);
+    // Show coming soon message
+    alert(`"${product.name}" added to cart!\n\n🚧 Note: Full shopping cart functionality is coming soon in a future update.`);
   }
 }

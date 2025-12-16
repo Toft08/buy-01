@@ -7,6 +7,9 @@ spring:
       database: media_service_db
       host: localhost
       port: 27017
+      username: admin
+      password: password
+      authentication-database: admin
   
   cloud:
     compatibility-verifier:

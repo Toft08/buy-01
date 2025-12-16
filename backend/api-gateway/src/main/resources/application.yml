@@ -48,7 +48,7 @@ server:
   port: 8080
 
 jwt:
-  secret: D341j5kfy5b3uFW/Xcw0KvP4/gfwho2UzAXAI6fGpUc=
+  secret-key: D341j5kfy5b3uFW/Xcw0KvP4/gfwho2UzAXAI6fGpUc=
 
 eureka:
   instance:

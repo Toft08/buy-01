@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environments';
 import { AuthResponse, LoginRequest, RegisterRequest, User } from '../models/ecommerce.model';
 
@@ -116,10 +116,46 @@ export class AuthService {
     if (userStr && token) {
       try {
         const user = JSON.parse(userStr);
+        // Temporarily set user for immediate UI rendering
         this.currentUserSubject.next(user);
+        // Validate token with backend asynchronously
+        this.validateToken(user);
       } catch (error) {
         this.clearCurrentUser();
       }
     }
+  }
+
+  /**
+   * Validates the stored token with the backend.
+   * If token is expired or blacklisted, clears the session.
+   */
+  private validateToken(user: User): void {
+    const token = localStorage.getItem('token');
+    if (!token || !user.id) {
+      return;
+    }
+
+    // Call backend to verify token is still valid
+    // Using the user endpoint as a validation check
+    this.http
+      .get<User>(`${environment.apiUrl}/users/${user.id}`, {
+        headers: new HttpHeaders({
+          Authorization: `Bearer ${token}`,
+        }),
+      })
+      .pipe(
+        catchError(() => {
+          // Token is invalid/expired/blacklisted - clear session
+          this.clearCurrentUser();
+          return of(null);
+        })
+      )
+      .subscribe((validatedUser) => {
+        if (validatedUser) {
+          // Update user data in case it changed on backend
+          this.setCurrentUser(validatedUser);
+        }
+      });
   }
 }

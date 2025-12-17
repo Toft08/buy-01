@@ -84,18 +84,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean isPublicEndpoint(String path, String method) {
         // Auth endpoints (any method)
-        if (path.equals("/auth/login") || path.equals("/auth/register")) {
+        if (path.startsWith("/auth/")) {
             return true;
         }
-        
+
         // Only GET requests can be public for the following endpoints
         if (!"GET".equalsIgnoreCase(method)) {
             return false;
         }
-        
+
         // Public media endpoints (viewing images and avatars) - GET only
         if (path.startsWith("/media/file/") || path.startsWith("/media/product/") ||
-            path.startsWith("/media/avatar/file/") || path.startsWith("/media/avatar/user/")) {
+                path.startsWith("/media/avatar/file/") || path.startsWith("/media/avatar/user/")) {
             return true;
         }
         // Public product endpoints (browsing products) - GET only

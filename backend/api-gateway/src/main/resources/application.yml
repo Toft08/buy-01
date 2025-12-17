@@ -4,122 +4,74 @@ spring:
 
   cloud:
     gateway:
-      default-filters:
-        - name: DedupeResponseHeader
-          args:
-            name: Access-Control-Allow-Origin
-            strategy: RETAIN_FIRST
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins:
-              - 'http://localhost:4200'
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: '*'
-            allowCredentials: true
-            maxAge: 3600
-      routes:
-        # Auth routes (no auth)
-        - id: user-service-auth
-          uri: lb://user-service
-          predicates:
-            - Path=/auth/**
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            # Auth routes (public)
+            - id: auth-service
+              uri: lb://user-service
+              predicates:
+                - Path=/auth/**
 
-        # User Service routes
-        - id: user-service
-          uri: lb://user-service
-          predicates:
-            - Path=/users/**
+            # User Service routes
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/users/**
 
-        # Public Product routes (no auth)
-        - id: product-service-public
-          uri: lb://product-service
-          predicates:
-            - Path=/products
-            - Method=GET
+            # Product Service - all endpoints
+            - id: all-products
+              uri: lb://product-service
+              predicates:
+                - Path=/products
 
-        - id: product-service-public-by-id
-          uri: lb://product-service
-          predicates:
-            - Path=/products/{id}
-            - Method=GET
+            - id: product-service
+              uri: lb://product-service
+              predicates:
+                - Path=/products/**
 
-        # Protected product routes (auth required)
-        - id: product-service-protected
-          uri: lb://product-service
-          predicates:
-            - Path=/products/**
-
-        # Public Media Routes (viewing images - no auth)
-        - id: media-service-public-file
-          uri: lb://media-service
-          predicates:
-            - Path=/media/file/**
-            - Method=GET
-
-        - id: media-service-public-product
-          uri: lb://media-service
-          predicates:
-            - Path=/media/product/**
-            - Method=GET
-
-        # Public Avatar Routes (viewing avatars - no auth)
-        - id: media-service-public-avatar-file
-          uri: lb://media-service
-          predicates:
-            - Path=/media/avatar/file/**
-            - Method=GET
-
-        - id: media-service-public-avatar-user
-          uri: lb://media-service
-          predicates:
-            - Path=/media/avatar/user/**
-            - Method=GET
-
-        # Protected Media Routes (upload/delete - auth required)
-        - id: media-service-protected
-          uri: lb://media-service
-          predicates:
-            - Path=/media/**
-          filters:
-            - name: RequestSize
-              args:
-                maxSize: 2MB
+            # Media Service routes
+            - id: media-service
+              uri: lb://media-service
+              predicates:
+                - Path=/media/**
+              filters:
+                - name: RequestSize
+                  args:
+                    maxSize: 2MB
 
 server:
   port: 8080
 
+jwt:
+  secret-key: D341j5kfy5b3uFW/Xcw0KvP4/gfwho2UzAXAI6fGpUc=
+
 eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    fetch-registry: true
-    register-with-eureka: true
   instance:
     hostname: localhost
     prefer-ip-address: false
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,gateway
+        include: health,info
   endpoint:
     health:
       show-details: always
 
 logging:
   level:
-    '[org.springframework.cloud.gateway]': DEBUG
-    '[reactor.netty]': DEBUG
-
-application:
-  security:
-    jwt:
-      secret-key: D341j5kfy5b3uFW/Xcw0KvP4/gfwho2UzAXAI6fGpUc=
-      expiration: 86400000
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: DEBUG
+    com.netflix.discovery: WARN
+    com.netflix.eureka: WARN

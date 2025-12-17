@@ -20,8 +20,15 @@ wait_for_service() {
     echo -e "${BLUE} Waiting for ${service_name} to be ready...${NC}"
 
     while [ $attempt -lt $max_attempts ]; do
-        # Try to connect to health endpoint and check status
-        if curl -s http://localhost:$port/actuator/health 2>/dev/null | grep -q '"status":"UP"'; then
+        # Gateway uses HTTPS, internal services use HTTP
+        local protocol="http"
+        local curl_opts="-s"
+        if [ "$port" = "8080" ]; then
+            protocol="https"
+            curl_opts="-k -s"  # Allow self-signed cert for gateway
+        fi
+        
+        if curl $curl_opts ${protocol}://localhost:$port/actuator/health 2>/dev/null | grep -q '"status":"UP"'; then
             echo -e "${GREEN}✅ $service_name is ready!${NC}"
             return 0
         fi
@@ -43,7 +50,7 @@ wait_for_eureka() {
     echo -e "${BLUE} Waiting for Eureka Server to be ready...${NC}"
 
     while [ $attempt -lt $max_attempts ]; do
-        # Check if Eureka actuator health endpoint is accessible
+        # Eureka is internal service - uses HTTP
         if curl -s http://localhost:8761/actuator/health 2>/dev/null | grep -q '"status":"UP"'; then
             echo -e "${GREEN}✅ Eureka Server is ready!${NC}"
             return 0
@@ -164,15 +171,17 @@ echo -e "${GREEN}✅ All services started successfully!${NC}"
 echo -e "${GREEN}════════════════════════════════════════════════${NC}"
 echo ""
 echo "Services:"
-echo "  Eureka:       http://localhost:8761 (PID: $EUREKA_PID)"
-echo "  User Service: http://localhost:8081 (PID: $USER_PID)"
-echo "  Product:      http://localhost:8082 (PID: $PRODUCT_PID)"
-echo "  Media:        http://localhost:8083 (PID: $MEDIA_PID)"
-echo "  Gateway:      http://localhost:8080 (PID: $GATEWAY_PID)"
+echo "  Eureka:       http://localhost:8761 (PID: $EUREKA_PID) [internal]"
+echo "  User Service: http://localhost:8081 (PID: $USER_PID) [internal]"
+echo "  Product:      http://localhost:8082 (PID: $PRODUCT_PID) [internal]"
+echo "  Media:        http://localhost:8083 (PID: $MEDIA_PID) [internal]"
+echo "  Gateway:      https://localhost:8080 (PID: $GATEWAY_PID) [public HTTPS]"
+echo ""
+echo "Frontend: Run 'cd frontend && npm start' to start on https://localhost:4200"
 echo ""
 echo "Logs are in: logs/ directory"
 echo "To stop all services: ./stop-all.sh"
 
 # Save PIDs to file for stop script
-mkdir -p ../logs
-echo "$EUREKA_PID $USER_PID $PRODUCT_PID $MEDIA_PID $GATEWAY_PID" > ../.service-pids
+mkdir -p logs
+echo "$EUREKA_PID $USER_PID $PRODUCT_PID $MEDIA_PID $GATEWAY_PID" > .service-pids

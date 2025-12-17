@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environments';
 import { Avatar, Media } from '../models/ecommerce.model';
 import { AuthService } from './auth.service';
 
@@ -8,24 +9,21 @@ import { AuthService } from './auth.service';
   providedIn: 'root',
 })
 export class MediaService {
-  private apiUrl = 'http://localhost:8080/media';
+  private apiUrl = `${environment.apiUrl}/media`;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService
-  ) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   uploadMedia(file: File, productId: string): Observable<Media> {
     const formData = new FormData();
     formData.append('file', file);
 
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
     });
 
     return this.http.post<Media>(`${this.apiUrl}/upload/${productId}`, formData, {
       headers: headers,
-      withCredentials: true
+      withCredentials: true,
     });
   }
 
@@ -40,7 +38,7 @@ export class MediaService {
   deleteMedia(mediaId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${mediaId}`, {
       headers: this.authService.getAuthHeaders(),
-      withCredentials: true
+      withCredentials: true,
     });
   }
 

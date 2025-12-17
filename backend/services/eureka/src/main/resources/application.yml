@@ -1,5 +1,9 @@
 server:
   port: 8761
+  ssl:
+    enabled: false
+    # Internal service - uses HTTP
+    # Only Gateway needs HTTPS (public-facing)
 
 spring:
   application:
@@ -14,7 +18,7 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+      defaultZone: ${EUREKA_PROTOCOL:http}://${eureka.instance.hostname}:${server.port}/eureka/
   server:
     # Disable self-preservation mode in development
     # Self-preservation prevents Eureka from removing services during network issues

@@ -32,3 +32,11 @@ logs/
 # Uploaded files (avatars, product images)
 uploads/
 **/uploads/
+
+# SSL certificates and private keys (self-signed for development)
+*.p12
+*.pem
+**/ssl/*.pem
+**/ssl/*.key
+frontend/ssl/
+backend/**/keystore.p12

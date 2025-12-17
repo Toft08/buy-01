@@ -1,4 +1,4 @@
 export const environment = {
-    production: false,
-    apiUrl: 'http://localhost:8080' // Gateway instead of localhost:8443
-}
+  production: false,
+  apiUrl: 'https://localhost:8080', // Gateway with HTTPS
+};

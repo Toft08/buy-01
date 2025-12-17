@@ -1,16 +1,13 @@
 spring:
   application:
     name: user-service
-  
+
   data:
     mongodb:
       database: user_service_db
       host: localhost
       port: 27017
-      username: admin
-      password: password
-      authentication-database: admin
-  
+
   kafka:
     bootstrap-servers: localhost:9092
     producer:

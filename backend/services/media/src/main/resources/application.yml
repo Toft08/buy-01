@@ -1,25 +1,22 @@
 spring:
   application:
     name: media-service
-  
+
   data:
     mongodb:
       database: media_service_db
       host: localhost
       port: 27017
-      username: admin
-      password: password
-      authentication-database: admin
-  
+
   cloud:
     compatibility-verifier:
       enabled: false
-  
+
   servlet:
     multipart:
       max-file-size: 2MB
       max-request-size: 2MB
-  
+
   kafka:
     bootstrap-servers: localhost:9092
     producer:
@@ -32,7 +29,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "*"
+        spring.json.trusted.packages: '*'
 
 kafka:
   topic:

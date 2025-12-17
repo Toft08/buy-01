@@ -47,6 +47,12 @@ spring:
 server:
   port: 8080
 
+cors:
+  allowed-origins: http://localhost:4200,http://localhost:8080
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: '*'
+  allow-credentials: true
+
 jwt:
   secret-key: D341j5kfy5b3uFW/Xcw0KvP4/gfwho2UzAXAI6fGpUc=
 

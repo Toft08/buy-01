@@ -79,8 +79,10 @@ export class NavbarComponent implements OnInit {
         this.closeDropdown();
         this.router.navigate(['/']);
       },
-      error: (error: unknown) => {
-        console.error('Logout error:', error);
+      error: () => {
+        // Even on error, still navigate home (auth service already cleared localStorage)
+        this.closeDropdown();
+        this.router.navigate(['/']);
       },
     });
   }

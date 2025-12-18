@@ -440,11 +440,6 @@ export class SellerDashboardComponent implements OnInit {
     });
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/']);
-  }
-
   resetForm(): void {
     this.newProduct = {
       name: '',

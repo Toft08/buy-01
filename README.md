@@ -5,6 +5,7 @@ A full-stack e-commerce platform built with **Spring Boot microservices** and **
 ## Features
 
 ### Backend (Spring Boot)
+
 - **User Management**: Registration as client or seller with JWT authentication
 - **Product Management**: CRUD operations for products (seller-only)
 - **Media Management**: Image upload with 2MB size limit and file type validation
@@ -13,6 +14,7 @@ A full-stack e-commerce platform built with **Spring Boot microservices** and **
 - **Database**: MongoDB with proper relationships between User, Product, and Media entities
 
 ### Frontend (Angular)
+
 - **Authentication**: Login/Register forms with role selection
 - **Home Page**: Featured products display with responsive design
 - **Product Browsing**: Public product listing with images
@@ -23,23 +25,53 @@ A full-stack e-commerce platform built with **Spring Boot microservices** and **
 ## Prerequisites
 
 - **Java 17+**
-- **Node.js 18+** 
+- **Node.js 18+**
 - **Maven**
 - **MongoDB** (local or Docker)
 - **Angular CLI** (optional but recommended)
 
 ## Installation & Setup
 
-### 1. Clone the Repository
+### Quick Start with Docker Compose (Recommended)
+
+The fastest way to run the entire application:
+
+```bash
+# 1. Generate SSL certificates
+./generate-ssl-certs.sh
+
+# 2. Build all services
+./docker-build.sh
+
+# 3. Start all containers
+docker-compose up -d
+
+# 4. View logs (optional)
+docker-compose logs -f
+
+# 5. Stop all services when done
+docker-compose down
+```
+
+**Access the application:**
+
+- Frontend: https://localhost:4200
+- API Gateway: https://localhost:8080 (accept self-signed certificate)
+- Eureka Dashboard: http://localhost:8761
+
+### Manual Setup (Development)
+
+#### 1. Clone the Repository
 
 ```bash
 git clone <repository-url>
 cd buy-01
 ```
 
-### 2. Backend Setup
+#### 2. Backend Setup
 
-#### Start MongoDB
+**Start MongoDB**
+
 ```bash
 # Using Docker (recommended)
 docker run -d -p 27017:27017 --name mongodb mongo
@@ -47,25 +79,43 @@ docker run -d -p 27017:27017 --name mongodb mongo
 # Or use local MongoDB installation
 ```
 
-#### Configure and Run Spring Boot
+**Generate SSL Certificates**
+
+```bash
+./generate-ssl-certs.sh
+```
+
+**Configure and Run Spring Boot**
+
 ```bash
 cd backend
 
 # Make Maven wrapper executable (if needed)
 chmod +x mvnw
 
-# Build and run the application
-./mvnw spring-boot:run
+# Build all services
+./mvnw clean install
+
+# Use start-all.sh script
+cd ..
+./start-all.sh
 ```
 
-The backend will be available at: `https://localhost:8443`
+Services will be available at:
 
-#### SSL Certificate
-The application uses HTTPS with a self-signed certificate. In your browser:
-1. Navigate to `https://localhost:8443`
+- API Gateway: https://localhost:8080
+- Eureka: http://localhost:8761
+- User Service: http://localhost:8081
+- Product Service: http://localhost:8082
+- Media Service: http://localhost:8083
+
+**SSL Certificate**
+The application uses HTTPS with self-signed certificates. In your browser:
+
+1. Navigate to `https://localhost:8080`
 2. Click "Advanced" → "Proceed to localhost" to accept the certificate
 
-### 3. Frontend Setup
+#### 3. Frontend Setup
 
 ```bash
 cd frontend
@@ -73,19 +123,19 @@ cd frontend
 # Install dependencies
 npm install
 
-# Start the development server
+# Start the development server with HTTPS
 npm start
 ```
 
-The frontend will be available at: `http://localhost:4200`
+The frontend will be available at: `https://localhost:4200`
 
 ## Usage
 
 ### Getting Started
 
 1. **Visit the Application**: Open `http://localhost:4200` in your browser
-2. **Create an Account**: 
-   - Click "Sign Up" 
+2. **Create an Account**:
+   - Click "Sign Up"
    - Choose account type: Client (buy products) or Seller (sell products)
    - For sellers, optionally add an avatar URL
 3. **Explore**: Browse featured products on the home page
@@ -93,21 +143,25 @@ The frontend will be available at: `http://localhost:4200`
 ### API Endpoints
 
 #### Authentication
+
 - `POST /auth/register` - Register new user
 - `POST /auth/login` - User login
 - `POST /auth/logout` - User logout
 
 #### Products (Public)
+
 - `GET /products` - List all products
 - `GET /products/{id}` - Get product by ID
 
 #### Products (Authenticated)
+
 - `POST /products` - Create product (sellers only)
 - `PUT /products/{id}` - Update product (owner only)
 - `DELETE /products/{id}` - Delete product (owner only)
 - `GET /products/my-products` - Get current user's products
 
 #### Media Management
+
 - `POST /media/upload/{productId}` - Upload product image (seller only)
 - `GET /media/product/{productId}` - Get product images
 - `GET /media/file/{mediaId}` - Serve image file
@@ -116,6 +170,7 @@ The frontend will be available at: `http://localhost:4200`
 ## Database Schema
 
 ### User Collection
+
 ```json
 {
   "_id": "ObjectId",
@@ -128,6 +183,7 @@ The frontend will be available at: `http://localhost:4200`
 ```
 
 ### Product Collection
+
 ```json
 {
   "_id": "ObjectId",
@@ -140,6 +196,7 @@ The frontend will be available at: `http://localhost:4200`
 ```
 
 ### Media Collection
+
 ```json
 {
   "_id": "ObjectId",
@@ -164,6 +221,7 @@ The frontend will be available at: `http://localhost:4200`
 ## Testing
 
 ### Quick Start
+
 ```bash
 # Run all integration tests
 ./run-tests.sh
@@ -175,7 +233,9 @@ cd backend/services/media && ../../mvnw test
 ```
 
 ### Integration Tests
+
 **28 comprehensive integration tests** using:
+
 - ✅ **@SpringBootTest** - Full application context
 - ✅ **MockMvc** - HTTP endpoint testing
 - ✅ **Testcontainers** - Isolated MongoDB per test class
@@ -183,18 +243,21 @@ cd backend/services/media && ../../mvnw test
 - ✅ **JwtTestUtil** - Real JWT token generation
 
 #### Test Coverage
-| Service | Tests | Coverage |
-|---------|-------|----------|
-| User Service | 8 | Registration, Login/Logout, Validation |
-| Product Service | 10 | CRUD, Authorization, Ownership |
-| Media Service | 10 | Upload, Download, Size Limits |
+
+| Service         | Tests | Coverage                               |
+| --------------- | ----- | -------------------------------------- |
+| User Service    | 8     | Registration, Login/Logout, Validation |
+| Product Service | 10    | CRUD, Authorization, Ownership         |
+| Media Service   | 10    | Upload, Download, Size Limits          |
 
 #### Documentation
+
 - **[INTEGRATION-TESTING.md](INTEGRATION-TESTING.md)** - Complete testing guide
 - **[TESTING-QUICK-REFERENCE.md](TESTING-QUICK-REFERENCE.md)** - Quick reference card
 - **[TEST-IMPLEMENTATION-SUMMARY.md](TEST-IMPLEMENTATION-SUMMARY.md)** - Implementation details
 
 ### Backend Testing (Legacy Bash Script)
+
 ```bash
 cd backend
 
@@ -206,6 +269,7 @@ cd backend
 ```
 
 ### Frontend Testing
+
 ```bash
 cd frontend
 
@@ -219,6 +283,7 @@ npm run e2e
 ### Manual Testing with Postman
 
 1. **Register a Seller**:
+
    ```json
    POST http://localhost:8080/auth/register
    {
@@ -231,6 +296,7 @@ npm run e2e
    ```
 
 2. **Login**:
+
    ```json
    POST http://localhost:8080/auth/login
    {
@@ -238,9 +304,11 @@ npm run e2e
      "password": "password123"
    }
    ```
+
    Copy the `token` from the response to use in subsequent requests.
 
 3. **Create a Product**:
+
    ```json
    POST http://localhost:8080/products
    Authorization: Bearer <token>
@@ -342,12 +410,14 @@ buy-01/
 ## Development Notes
 
 ### Backend Architecture
+
 - Clean and professional codebase with proper package structure
 - Extended User model with Role enum and avatar support
 - Added Media entity for image management
 - Implemented comprehensive security and validation
 
-### Frontend Architecture  
+### Frontend Architecture
+
 - Modern Angular application with clean architecture
 - Replaced CAPTCHA components with e-commerce components
 - Modern Angular with standalone components

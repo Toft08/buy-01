@@ -42,12 +42,14 @@ services:
         [
           'CMD',
           'mongosh',
-          '--username',
-          'admin',
-          '--password',
-          'password',
           '--eval',
           "db.adminCommand('ping')",
+          '-u',
+          'admin',
+          '-p',
+          'password',
+          '--authenticationDatabase',
+          'admin',
         ]
       interval: 5s
       timeout: 2s
@@ -78,8 +80,20 @@ services:
       - '8080:8080'
     networks:
       - buy-01-network
+    healthcheck:
+      test: ['CMD', 'curl', '-k', '-f', 'https://localhost:8080/actuator/health']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
     depends_on:
       eureka-server:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+      media-service:
         condition: service_healthy
 
   user-service:
@@ -88,12 +102,22 @@ services:
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
-      SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_USERNAME: admin
+      SPRING_DATA_MONGODB_PASSWORD: password
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     expose:
       - '8081'
     networks:
       - buy-01-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8081/actuator/health']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -106,12 +130,22 @@ services:
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
-      SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_USERNAME: admin
+      SPRING_DATA_MONGODB_PASSWORD: password
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     expose:
       - '8082'
     networks:
       - buy-01-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8082/actuator/health']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -124,7 +158,11 @@ services:
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
-      SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_USERNAME: admin
+      SPRING_DATA_MONGODB_PASSWORD: password
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     expose:
       - '8083'
@@ -132,6 +170,12 @@ services:
       - buy-01-network
     volumes:
       - ./backend/services/media/uploads:/app/uploads
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8083/actuator/health']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -142,14 +186,18 @@ services:
   # Frontend
   # -------------------
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        API_URL: https://api-gateway:8080
     container_name: buyapp-frontend
     ports:
-      - '4200:80'
+      - '4200:443'
     networks:
       - buy-01-network
     depends_on:
-      - api-gateway
+      api-gateway:
+        condition: service_healthy
 
 # -------------------
 # Networks & Volumes

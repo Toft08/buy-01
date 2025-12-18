@@ -60,7 +60,7 @@ docker-compose ps
 echo ""
 echo "🌐 Access Points:"
 echo "  - Eureka Dashboard: http://localhost:8761"
-echo "  - API Gateway: http://localhost:8080"
+echo "  - API Gateway: https://localhost:8080"
 echo "  - MongoDB: mongodb://localhost:27017"
 echo "  - Kafka: localhost:9092"
 echo ""

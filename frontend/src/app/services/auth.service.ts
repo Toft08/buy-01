@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environments';
@@ -12,6 +13,7 @@ export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  private router = inject(Router);
 
   constructor(private http: HttpClient) {
     this.loadUserFromStorage();
@@ -47,7 +49,8 @@ export class AuthService {
     // Clear localStorage immediately - logout should always work client-side
     this.clearCurrentUser();
 
-    return this.http
+    // Attempt to blacklist token on backend
+    const logoutRequest = this.http
       .post<string>(
         `${this.apiUrl}/logout`,
         {},
@@ -57,11 +60,18 @@ export class AuthService {
         }
       )
       .pipe(
-        catchError(() => {
+        catchError((error) => {
           // Backend call failed, but we've already cleared client state
+          console.warn('Backend logout failed, but local state cleared', error);
           return of('Logged out locally');
+        }),
+        tap(() => {
+          // Force hard refresh to clear any cached state
+          window.location.href = '/';
         })
       );
+
+    return logoutRequest;
   }
 
   getCurrentUser(): User | null {
@@ -149,9 +159,15 @@ export class AuthService {
         }),
       })
       .pipe(
-        catchError(() => {
+        catchError((error) => {
           // Token is invalid/expired/blacklisted - clear session
+          console.warn('Token validation failed - clearing session', error.status);
           this.clearCurrentUser();
+
+          // Show user feedback and redirect to login
+          alert('Your session has expired. Please log in again.');
+          this.router.navigate(['/login']);
+
           return of(null);
         })
       )

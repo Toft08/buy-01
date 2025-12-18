@@ -74,16 +74,9 @@ export class NavbarComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.closeDropdown();
-        this.router.navigate(['/']);
-      },
-      error: () => {
-        // Even on error, still navigate home (auth service already cleared localStorage)
-        this.closeDropdown();
-        this.router.navigate(['/']);
-      },
-    });
+    this.closeDropdown();
+    // Auth service handles logout + hard refresh
+    // Subscribe to trigger the request (hard refresh happens in service)
+    this.authService.logout().subscribe();
   }
 }

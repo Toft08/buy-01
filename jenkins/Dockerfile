@@ -1,4 +1,4 @@
-# Custom Jenkins image with Maven, Node.js, and Docker CLI
+# Custom Jenkins image with Maven, Node.js, Docker CLI, and Chromium
 # Based on official Jenkins LTS with Java 17
 
 FROM jenkins/jenkins:lts-jdk17
@@ -6,13 +6,19 @@ FROM jenkins/jenkins:lts-jdk17
 # Switch to root to install packages
 USER root
 
-# Install essential tools and Docker CLI
+# Install essential tools, Docker CLI, and Chromium for frontend tests
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
     git \
     docker.io \
+    chromium \
+    chromium-driver \
     && rm -rf /var/lib/apt/lists/*
+
+# Set Chrome environment variables for Karma
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROMIUM_BIN=/usr/bin/chromium
 
 # Install Maven 3.9.x
 ARG MAVEN_VERSION=3.9.6

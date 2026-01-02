@@ -216,12 +216,18 @@ pipeline {
         
         // ==========================================
         // STAGE 7: TEST FRONTEND
-        // Note: Skipped in CI due to Chrome dependency
+        // Run Karma/Jasmine tests for Angular
         // ==========================================
         stage('Test Frontend') {
             steps {
-                echo '🧪 Skipping frontend tests (Chrome not available in CI)...'
-                echo '📝 To enable: Install Chrome in Jenkins or configure headless testing'
+                echo '🧪 Running frontend tests...'
+                
+                dir('frontend') {
+                    sh '''
+                        # Run tests with headless Chrome
+                        npm run test -- --watch=false --browsers=ChromeHeadless
+                    '''
+                }
             }
         }
         

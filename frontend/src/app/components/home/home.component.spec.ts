@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { of } from 'rxjs';
-import { HomeComponent } from './home.component';
-import { AuthService } from '../../services/auth.service';
-import { ProductService } from '../../services/product.service';
-import { MediaService } from '../../services/media.service';
 import { Product, User } from '../../models/ecommerce.model';
+import { AuthService } from '../../services/auth.service';
+import { MediaService } from '../../services/media.service';
+import { ProductService } from '../../services/product.service';
+import { HomeComponent } from './home.component';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -18,7 +18,7 @@ describe('HomeComponent', () => {
     id: '1',
     name: 'testuser',
     email: 'test@example.com',
-    role: 'client'
+    role: 'client',
   };
 
   const mockProducts: Product[] = [
@@ -28,7 +28,7 @@ describe('HomeComponent', () => {
       description: 'Description 1',
       price: 99.99,
       quality: 10,
-      user: 'seller@example.com'
+      user: 'seller@example.com',
     },
     {
       id: '2',
@@ -36,15 +36,15 @@ describe('HomeComponent', () => {
       description: 'Description 2',
       price: 149.99,
       quality: 5,
-      user: 'seller@example.com'
-    }
+      user: 'seller@example.com',
+    },
   ];
 
   beforeEach(async () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', [
       'getCurrentUser',
       'isLoggedIn',
-      'isSeller'
+      'isSeller',
     ]);
     const productServiceSpy = jasmine.createSpyObj('ProductService', ['getAllProducts']);
     const mediaServiceSpy = jasmine.createSpyObj('MediaService', ['getMediaByProduct']);
@@ -54,14 +54,14 @@ describe('HomeComponent', () => {
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
         { provide: ProductService, useValue: productServiceSpy },
-        { provide: MediaService, useValue: mediaServiceSpy }
-      ]
+        { provide: MediaService, useValue: mediaServiceSpy },
+      ],
     }).compileComponents();
 
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     productService = TestBed.inject(ProductService) as jasmine.SpyObj<ProductService>;
     mediaService = TestBed.inject(MediaService) as jasmine.SpyObj<MediaService>;
-    
+
     // Default mock returns
     authService.getCurrentUser.and.returnValue(mockUser);
     authService.isLoggedIn.and.returnValue(true);
@@ -105,7 +105,7 @@ describe('HomeComponent', () => {
 
   it('should set isLoading to false after loading products', (done) => {
     fixture.detectChanges();
-    
+
     setTimeout(() => {
       expect(component.isLoading).toBe(false);
       done();
@@ -115,7 +115,7 @@ describe('HomeComponent', () => {
   it('should handle empty product list', () => {
     productService.getAllProducts.and.returnValue(of([]));
     fixture.detectChanges();
-    
+
     expect(component.featuredProducts).toEqual([]);
   });
 });

@@ -8,26 +8,22 @@ module.exports = function (config) {
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
-      require('@angular-devkit/build-angular/plugins/karma')
+      require('@angular-devkit/build-angular/plugins/karma'),
     ],
     client: {
       jasmine: {
         random: false,
-        stopSpecOnExpectationFailure: false
+        stopSpecOnExpectationFailure: false,
       },
-      clearContext: false
+      clearContext: false,
     },
     jasmineHtmlReporter: {
-      suppressAll: true
+      suppressAll: true,
     },
     coverageReporter: {
       dir: require('path').join(__dirname, './coverage'),
       subdir: '.',
-      reporters: [
-        { type: 'html' },
-        { type: 'text-summary' },
-        { type: 'lcovonly' }
-      ]
+      reporters: [{ type: 'html' }, { type: 'text-summary' }, { type: 'lcovonly' }],
     },
     reporters: ['progress', 'kjhtml', 'coverage'],
     port: 9876,
@@ -38,18 +34,14 @@ module.exports = function (config) {
     customLaunchers: {
       ChromeHeadlessCI: {
         base: 'ChromeHeadless',
-        flags: [
-          '--no-sandbox',
-          '--disable-gpu',
-          '--disable-dev-shm-usage'
-        ]
-      }
+        flags: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
+      },
     },
     singleRun: true,
     restartOnFileChange: false,
     captureTimeout: 60000,
     browserDisconnectTimeout: 10000,
     browserDisconnectTolerance: 3,
-    browserNoActivityTimeout: 60000
+    browserNoActivityTimeout: 60000,
   });
 };

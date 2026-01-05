@@ -1,34 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
-import { LoginComponent } from './login.component';
 import { AuthService } from '../../services/auth.service';
+import { LoginComponent } from './login.component';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
   let authService: jasmine.SpyObj<AuthService>;
-  let router: jasmine.SpyObj<Router>;
+  let router: Router;
 
   beforeEach(async () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['login']);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: { queryParams: {} }
-    });
 
     await TestBed.configureTestingModule({
-      imports: [LoginComponent, ReactiveFormsModule],
-      providers: [
-        { provide: AuthService, useValue: authServiceSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy }
-      ]
+      imports: [LoginComponent, ReactiveFormsModule, RouterTestingModule],
+      providers: [{ provide: AuthService, useValue: authServiceSpy }],
     }).compileComponents();
 
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -54,7 +48,7 @@ describe('LoginComponent', () => {
     const emailControl = component.loginForm.get('email');
     emailControl?.setValue('invalid-email');
     expect(emailControl?.hasError('email')).toBe(true);
-    
+
     emailControl?.setValue('valid@email.com');
     expect(emailControl?.hasError('email')).toBe(false);
   });
@@ -69,7 +63,7 @@ describe('LoginComponent', () => {
     const passwordControl = component.loginForm.get('password');
     passwordControl?.setValue('ab');
     expect(passwordControl?.hasError('minlength')).toBe(true);
-    
+
     passwordControl?.setValue('abc');
     expect(passwordControl?.hasError('minlength')).toBe(false);
   });
@@ -77,7 +71,7 @@ describe('LoginComponent', () => {
   it('should not submit if form is invalid', () => {
     component.loginForm.patchValue({ email: '', password: '' });
     component.onSubmit();
-    
+
     expect(authService.login).not.toHaveBeenCalled();
   });
 
@@ -85,20 +79,20 @@ describe('LoginComponent', () => {
     const mockResponse = {
       token: 'mock-token',
       user: { id: '1', name: 'Test User', email: 'test@example.com', role: 'client' as const },
-      message: 'Login successful'
+      message: 'Login successful',
     };
     authService.login.and.returnValue(of(mockResponse));
 
     component.loginForm.patchValue({
       email: 'test@example.com',
-      password: 'password123'
+      password: 'password123',
     });
 
     component.onSubmit();
 
     expect(authService.login).toHaveBeenCalledWith({
       email: 'test@example.com',
-      password: 'password123'
+      password: 'password123',
     });
   });
 
@@ -108,7 +102,7 @@ describe('LoginComponent', () => {
 
     component.loginForm.patchValue({
       email: 'test@example.com',
-      password: 'wrongpassword'
+      password: 'wrongpassword',
     });
 
     component.onSubmit();
@@ -119,14 +113,14 @@ describe('LoginComponent', () => {
   it('should disable submit during loading', () => {
     component.isLoading = true;
     const initialCallCount = authService.login.calls.count();
-    
+
     component.loginForm.patchValue({
       email: 'test@example.com',
-      password: 'password123'
+      password: 'password123',
     });
-    
+
     component.onSubmit();
-    
+
     expect(authService.login.calls.count()).toBe(initialCallCount);
   });
 });

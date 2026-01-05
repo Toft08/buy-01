@@ -1,10 +1,10 @@
-import { TestBed } from '@angular/core/testing';
+import { HttpHeaders } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ProductService } from './product.service';
-import { AuthService } from './auth.service';
+import { TestBed } from '@angular/core/testing';
 import { environment } from '../../environments/environments';
 import { Product } from '../models/ecommerce.model';
-import { HttpHeaders } from '@angular/common/http';
+import { AuthService } from './auth.service';
+import { ProductService } from './product.service';
 
 describe('ProductService', () => {
   let service: ProductService;
@@ -18,7 +18,7 @@ describe('ProductService', () => {
       description: 'Description 1',
       price: 99.99,
       quality: 10,
-      user: 'seller@example.com'
+      user: 'seller@example.com',
     },
     {
       id: '2',
@@ -26,22 +26,21 @@ describe('ProductService', () => {
       description: 'Description 2',
       price: 149.99,
       quality: 5,
-      user: 'seller@example.com'
-    }
+      user: 'seller@example.com',
+    },
   ];
 
   const mockProduct: Product = mockProducts[0];
 
   beforeEach(() => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['getAuthHeaders']);
-    authServiceSpy.getAuthHeaders.and.returnValue(new HttpHeaders({ 'Authorization': 'Bearer mock-token' }));
+    authServiceSpy.getAuthHeaders.and.returnValue(
+      new HttpHeaders({ Authorization: 'Bearer mock-token' })
+    );
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        ProductService,
-        { provide: AuthService, useValue: authServiceSpy }
-      ]
+      providers: [ProductService, { provide: AuthService, useValue: authServiceSpy }],
     });
 
     service = TestBed.inject(ProductService);
@@ -59,7 +58,7 @@ describe('ProductService', () => {
 
   describe('getAllProducts', () => {
     it('should fetch all products', () => {
-      service.getAllProducts().subscribe(products => {
+      service.getAllProducts().subscribe((products) => {
         expect(products).toEqual(mockProducts);
         expect(products.length).toBe(2);
       });
@@ -70,7 +69,7 @@ describe('ProductService', () => {
     });
 
     it('should handle empty product list', () => {
-      service.getAllProducts().subscribe(products => {
+      service.getAllProducts().subscribe((products) => {
         expect(products).toEqual([]);
       });
 
@@ -83,7 +82,7 @@ describe('ProductService', () => {
     it('should fetch a product by id', () => {
       const productId = '1';
 
-      service.getProductById(productId).subscribe(product => {
+      service.getProductById(productId).subscribe((product) => {
         expect(product).toEqual(mockProduct);
       });
 
@@ -109,7 +108,7 @@ describe('ProductService', () => {
 
   describe('getMyProducts', () => {
     it('should fetch seller products with auth headers', () => {
-      service.getMyProducts().subscribe(products => {
+      service.getMyProducts().subscribe((products) => {
         expect(products).toEqual(mockProducts);
       });
 
@@ -128,10 +127,10 @@ describe('ProductService', () => {
         description: 'New Description',
         price: 199.99,
         quality: 20,
-        user: 'seller@example.com'
+        user: 'seller@example.com',
       };
 
-      service.createProduct(newProduct).subscribe(product => {
+      service.createProduct(newProduct).subscribe((product) => {
         expect(product.id).toBeDefined();
         expect(product.name).toBe(newProduct.name);
       });
@@ -141,7 +140,7 @@ describe('ProductService', () => {
       expect(req.request.body).toEqual(newProduct);
       expect(req.request.withCredentials).toBe(true);
       expect(authService.getAuthHeaders).toHaveBeenCalled();
-      
+
       req.flush({ ...newProduct, id: '3' });
     });
   });
@@ -151,7 +150,7 @@ describe('ProductService', () => {
       const updatedProduct: Product = { ...mockProduct, price: 129.99 };
       const productId = '1';
 
-      service.updateProduct(productId, updatedProduct).subscribe(product => {
+      service.updateProduct(productId, updatedProduct).subscribe((product) => {
         expect(product.price).toBe(129.99);
       });
 
@@ -160,7 +159,7 @@ describe('ProductService', () => {
       expect(req.request.body).toEqual(updatedProduct);
       expect(req.request.withCredentials).toBe(true);
       expect(authService.getAuthHeaders).toHaveBeenCalled();
-      
+
       req.flush(updatedProduct);
     });
   });
@@ -169,7 +168,7 @@ describe('ProductService', () => {
     it('should delete a product', () => {
       const productId = '1';
 
-      service.deleteProduct(productId).subscribe(response => {
+      service.deleteProduct(productId).subscribe((response) => {
         expect(response).toBeTruthy();
       });
 
@@ -177,7 +176,7 @@ describe('ProductService', () => {
       expect(req.request.method).toBe('DELETE');
       expect(req.request.withCredentials).toBe(true);
       expect(authService.getAuthHeaders).toHaveBeenCalled();
-      
+
       req.flush({ message: 'Product deleted' });
     });
 
@@ -186,7 +185,7 @@ describe('ProductService', () => {
         name: 'Product',
         description: 'Test',
         price: -10.0,
-        quality: 5
+        quality: 5,
       };
 
       expect(invalidProduct.price < 0).toBe(true);
@@ -197,7 +196,7 @@ describe('ProductService', () => {
         name: 'Product',
         description: 'Test',
         price: 10.0,
-        quality: -5
+        quality: -5,
       };
 
       expect(invalidProduct.quality < 0).toBe(true);

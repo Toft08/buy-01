@@ -66,8 +66,8 @@ export class AuthService {
           return of('Logged out locally');
         }),
         tap(() => {
-          // Force hard refresh to clear any cached state
-          window.location.href = '/';
+          // Navigate to home page to clear any cached state
+          this.router.navigate(['/']);
         })
       );
 

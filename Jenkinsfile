@@ -85,6 +85,8 @@ pipeline {
                 }
                 sh '''
                     export WORKSPACE="${WORKSPACE}"
+                    export JAVA_HOME="${JAVA_HOME}"
+                    export PATH="${JAVA_HOME}/bin:${PATH}"
                     bash jenkins/scripts/build-backend.sh
                 '''
             }
@@ -125,6 +127,8 @@ pipeline {
                 }
                 sh '''
                     export WORKSPACE="${WORKSPACE}"
+                    export JAVA_HOME="${JAVA_HOME}"
+                    export PATH="${JAVA_HOME}/bin:${PATH}"
                     bash jenkins/scripts/run-backend-tests.sh
                 '''
             }

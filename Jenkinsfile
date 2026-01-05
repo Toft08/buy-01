@@ -140,7 +140,6 @@ pipeline {
             post {
                 always {
                     junit 'test-reports/backend/**/*.xml'
-                    publishTestResults testResultsPattern: 'test-reports/backend/**/*.xml'
                 }
             }
         }
@@ -163,7 +162,7 @@ pipeline {
                     // Publish frontend test results if available
                     script {
                         if (fileExists('test-reports/frontend')) {
-                            publishTestResults testResultsPattern: 'test-reports/frontend/**/*.xml'
+                            junit 'test-reports/frontend/**/*.xml'
                         }
                     }
                 }

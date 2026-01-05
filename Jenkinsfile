@@ -264,9 +264,10 @@ pipeline {
                     # Wait a bit for services to stabilize
                     sleep 10
 
-                    # Check API Gateway
+                    # Check API Gateway (port set dynamically)
                     echo "Checking API Gateway health..."
-                    curl -k -f https://localhost:8080/actuator/health || {
+                    API_PORT=${API_GATEWAY_PORT:-8080}
+                    curl -k -f https://localhost:${API_PORT}/actuator/health || {
                         echo "❌ API Gateway health check failed"
                         exit 1
                     }

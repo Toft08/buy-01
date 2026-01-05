@@ -1,8 +1,6 @@
 # Docker Compose override for CI/CD environment
 # This file extends docker-compose.yml with CI-specific settings
 
-version: '3.8'
-
 services:
   # Backend services with CI-specific configurations
   eureka-server:
@@ -15,6 +13,9 @@ services:
 
   api-gateway:
     restart: unless-stopped
+    # Port will be set dynamically via environment variable
+    ports:
+      - '${API_GATEWAY_PORT:-8080}:8080'
     logging:
       driver: 'json-file'
       options:

@@ -13,9 +13,6 @@ services:
 
   api-gateway:
     restart: unless-stopped
-    # Use port 8081 to avoid conflict with Jenkins (8080)
-    ports:
-      - '8081:8080'
     logging:
       driver: 'json-file'
       options:

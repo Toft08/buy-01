@@ -38,7 +38,19 @@ services:
     networks:
       - ecom-network
     healthcheck:
-      test: [ 'CMD', 'mongosh', '--eval', "db.adminCommand('ping')", '-u', 'admin', '-p', 'password', '--authenticationDatabase', 'admin' ]
+      test:
+        [
+          'CMD',
+          'mongosh',
+          '--eval',
+          "db.adminCommand('ping')",
+          '-u',
+          'admin',
+          '-p',
+          'password',
+          '--authenticationDatabase',
+          'admin',
+        ]
       interval: 5s
       timeout: 2s
       retries: 10
@@ -54,7 +66,7 @@ services:
     networks:
       - ecom-network
     healthcheck:
-      test: [ 'CMD', 'curl', '-f', 'http://localhost:8761/actuator/health' ]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8761/actuator/health']
       interval: 5s
       timeout: 2s
       retries: 10
@@ -69,7 +81,7 @@ services:
     networks:
       - ecom-network
     healthcheck:
-      test: [ 'CMD', 'curl', '-k', '-f', 'https://localhost:8080/actuator/health' ]
+      test: ['CMD', 'curl', '-k', '-f', 'https://localhost:8080/actuator/health']
       interval: 10s
       timeout: 5s
       retries: 10
@@ -101,7 +113,7 @@ services:
     networks:
       - ecom-network
     healthcheck:
-      test: [ 'CMD', 'curl', '-f', 'http://localhost:8081/actuator/health' ]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8081/actuator/health']
       interval: 10s
       timeout: 3s
       retries: 5
@@ -129,7 +141,7 @@ services:
     networks:
       - ecom-network
     healthcheck:
-      test: [ 'CMD', 'curl', '-f', 'http://localhost:8082/actuator/health' ]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8082/actuator/health']
       interval: 10s
       timeout: 3s
       retries: 5
@@ -159,7 +171,7 @@ services:
     volumes:
       - ./backend/services/media/uploads:/app/uploads
     healthcheck:
-      test: [ 'CMD', 'curl', '-f', 'http://localhost:8083/actuator/health' ]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8083/actuator/health']
       interval: 10s
       timeout: 3s
       retries: 5
@@ -192,7 +204,6 @@ services:
 # -------------------
 networks:
   ecom-network:
-
 
 volumes:
   mongodb_data:

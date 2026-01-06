@@ -25,7 +25,6 @@ pipeline {
         COMPOSE_DOCKER_CLI_BUILD = '1'
 
         // Notification configuration (set via Jenkins credentials or environment)
-        SLACK_ENABLED = "${env.SLACK_ENABLED ?: 'false'}"
         EMAIL_ENABLED = "${env.EMAIL_ENABLED ?: 'true'}"
     }
 
@@ -323,30 +322,7 @@ pipeline {
                     commitMessage = "Unable to retrieve commit message"
                 }
 
-                // Slack notification
-                if (env.SLACK_ENABLED == 'true' && env.SLACK_WEBHOOK_URL) {
-                    try {
-                        def slackMessage = """
-                            ✅ *Build Successful*
-
-                            *Project:* ${env.JOB_NAME}
-                            *Build Number:* #${env.BUILD_NUMBER}
-                            *Branch:* ${env.GIT_BRANCH_NAME ?: 'unknown'}
-                            *Commit:* ${commitMessage.take(50)}
-                            *Build URL:* ${env.BUILD_URL}
-                        """.stripIndent()
-
-                        sh """
-                            curl -X POST -H 'Content-type: application/json' \
-                            --data '{\"text\":\"${slackMessage.replace('"', '\\"')}\"}' \
-                            ${env.SLACK_WEBHOOK_URL}
-                        """
-                    } catch (Exception e) {
-                        echo "Slack notification failed: ${e.getMessage()}"
-                    }
-                }
-
-                // Email notification (optional)
+                // Email notification
                 if (env.EMAIL_ENABLED == 'true') {
                     emailext (
                         subject: "✅ Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
@@ -390,29 +366,6 @@ pipeline {
                         }
                     } catch (Exception e) {
                         echo "Rollback failed: ${e.getMessage()}"
-                    }
-                }
-
-                // Slack notification
-                if (env.SLACK_ENABLED == 'true' && env.SLACK_WEBHOOK_URL) {
-                    try {
-                        def slackMessage = """
-                            ❌ *Build Failed*
-
-                            *Project:* ${env.JOB_NAME}
-                            *Build Number:* #${env.BUILD_NUMBER}
-                            *Branch:* ${env.GIT_BRANCH_NAME ?: 'unknown'}
-                            *Commit:* ${commitMessage.take(50)}
-                            *Build URL:* ${env.BUILD_URL}
-                        """.stripIndent()
-
-                        sh """
-                            curl -X POST -H 'Content-type: application/json' \
-                            --data '{\"text\":\"${slackMessage.replace('"', '\\"')}\"}' \
-                            ${env.SLACK_WEBHOOK_URL}
-                        """
-                    } catch (Exception e) {
-                        echo "Slack notification failed: ${e.getMessage()}"
                     }
                 }
 

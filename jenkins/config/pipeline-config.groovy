@@ -5,15 +5,6 @@ def getConfig() {
     return [
         // Notification Configuration
         notifications: [
-            // Slack Configuration (optional)
-            slack: [
-                enabled: env.SLACK_ENABLED ? env.SLACK_ENABLED.toBoolean() : false,
-                webhookUrl: env.SLACK_WEBHOOK_URL ?: '',
-                channel: env.SLACK_CHANNEL ?: '#jenkins',
-                notifyOnSuccess: true,
-                notifyOnFailure: true,
-                notifyOnUnstable: true
-            ],
             // Email Configuration
             email: [
                 enabled: env.EMAIL_ENABLED ? env.EMAIL_ENABLED.toBoolean() : true,

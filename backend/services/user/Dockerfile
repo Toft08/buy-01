@@ -2,21 +2,23 @@
 FROM eclipse-temurin:17-jdk-jammy AS builder
 WORKDIR /build
 
-# Copy Maven wrapper and parent POM
-COPY mvnw mvnw.cmd pom.xml ./
+# Install Maven
+RUN apt-get update && \
+    apt-get install -y maven && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy parent POM and modules
+COPY pom.xml ./
 COPY shared ./shared
 COPY services/user ./services/user
 
-# Make mvnw executable
-RUN chmod +x mvnw
-
 # Build shared module first
 WORKDIR /build
-RUN ./mvnw clean install -DskipTests -f pom.xml -pl shared -am
+RUN mvn clean install -DskipTests -f pom.xml -pl shared -am
 
 # Build user service
 WORKDIR /build/services/user
-RUN ../../mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests -f pom.xml
 
 # Runtime stage
 FROM eclipse-temurin:17-jdk-jammy

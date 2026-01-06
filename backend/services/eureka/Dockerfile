@@ -2,16 +2,18 @@
 FROM eclipse-temurin:17-jdk-jammy AS builder
 WORKDIR /build
 
-# Copy Maven wrapper and parent POM
-COPY mvnw mvnw.cmd pom.xml ./
-COPY services/eureka ./services/eureka
+# Install Maven
+RUN apt-get update && \
+    apt-get install -y maven && \
+    rm -rf /var/lib/apt/lists/*
 
-# Make mvnw executable
-RUN chmod +x mvnw
+# Copy parent POM and service
+COPY pom.xml ./
+COPY services/eureka ./services/eureka
 
 # Build Eureka server
 WORKDIR /build/services/eureka
-RUN ../../mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests -f pom.xml
 
 # Runtime stage
 FROM eclipse-temurin:17-jdk-jammy

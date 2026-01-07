@@ -61,14 +61,19 @@ pipeline {
                               --tmpfs /tmp:rw,exec,nosuid,size=2g \
                               --cap-add=SYS_ADMIN \
                               zenika/alpine-chrome:with-node \
-                              sh -c "
+                              sh -c '
+                                echo "Checking /workspace..." && \
+                                ls -la /workspace/ && \
+                                echo "Creating /tmp/test..." && \
                                 mkdir -p /tmp/test && \
+                                echo "Copying files..." && \
+                                cp -r /workspace/. /tmp/test/ && \
                                 cd /tmp/test && \
-                                cp -r /workspace/* . && \
-                                cp /workspace/.* . 2>/dev/null || true && \
+                                echo "Files in /tmp/test:" && \
+                                ls -la && \
                                 npm install --legacy-peer-deps --cache /tmp/.npm --no-save --no-package-lock && \
                                 CHROME_BIN=/usr/bin/chromium-browser npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
-                              " || {
+                              ' || {
                                 EXIT_CODE=$?
                                 echo "Frontend tests failed with exit code: $EXIT_CODE"
                                 exit $EXIT_CODE

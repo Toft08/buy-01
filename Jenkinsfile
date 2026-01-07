@@ -57,13 +57,13 @@ pipeline {
                             echo "Running frontend tests in isolated Chrome container..."
 
                             docker run --rm \
-                              -v ${WORKSPACE}/frontend:/src:ro \
+                              -v ${WORKSPACE}/frontend:/workspace \
+                              --tmpfs /tmp:rw,exec,nosuid,size=2g \
                               --cap-add=SYS_ADMIN \
                               zenika/alpine-chrome:with-node \
                               sh -c "
-                                cd /tmp && \
-                                cp -r /src/. . && \
-                                npm install --legacy-peer-deps && \
+                                cd /workspace && \
+                                npm ci --cache /tmp/.npm --prefer-offline && \
                                 CHROME_BIN=/usr/bin/chromium-browser npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
                               " || {
                                 EXIT_CODE=$?

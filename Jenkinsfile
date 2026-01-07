@@ -179,21 +179,15 @@ pipeline {
                         ./generate-ssl-certs.sh
                     fi
 
-                    # Build Docker images sequentially with progress output
-                    # Building one at a time provides better visibility and reduces resource contention
-                    echo "Building Docker images sequentially..."
+                    # Build Docker images in parallel for speed
+                    # Each service builds independently (shared module is built within each Dockerfile)
+                    echo "Building Docker images in parallel..."
 
-                    # List of services to build in order
-                    SERVICES="eureka-server user-service product-service media-service api-gateway frontend"
-
-                    # Build each service
-                    for service in $SERVICES; do
-                        echo "📦 Building ${service}..."
-                        if ! docker-compose -f docker-compose.yml -f docker-compose.ci.yml build --progress=plain "${service}"; then
-                            echo "❌ Failed to build ${service}"
-                            exit 1
-                        fi
-                    done
+                    # Build all services in parallel (docker-compose handles this efficiently)
+                    if ! docker-compose -f docker-compose.yml -f docker-compose.ci.yml build --parallel; then
+                        echo "❌ Docker build failed"
+                        exit 1
+                    fi
 
                     echo "✅ All Docker images built successfully!"
 

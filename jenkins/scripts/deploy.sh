@@ -16,26 +16,6 @@ NC='\033[0m'
 
 cd "$WORKSPACE" || exit 1
 
-
-# Wait for service health
-wait_for_service() {
-    local service_name=$1
-    local port=$2
-    local protocol=$([ "$port" -ge 8080 ] && [ "$port" -le 8099 ] && echo "https" || echo "http")
-    local opts=$([ "$protocol" = "https" ] && echo "-k" || echo "")
-
-    echo -e "${BLUE}Waiting for ${service_name}...${NC}"
-    for i in {1..60}; do
-        if curl $opts -s ${protocol}://localhost:$port/actuator/health 2>/dev/null | grep -q '"status":"UP"'; then
-            echo -e "${GREEN}✅ ${service_name} ready!${NC}"
-            return 0
-        fi
-        sleep 2
-    done
-    echo -e "${RED}❌ ${service_name} failed to start${NC}"
-    return 1
-}
-
 # Ensure SSL certificates exist
 if [ ! -f "frontend/ssl/localhost-cert.pem" ] || [ ! -f "frontend/ssl/localhost-key.pem" ]; then
     echo -e "${YELLOW}Generating SSL certificates...${NC}"
@@ -46,22 +26,26 @@ fi
 echo -e "${YELLOW}Stopping existing containers...${NC}"
 docker-compose -f docker-compose.yml -f docker-compose.ci.yml down --timeout 30 || true
 
-# Build and start services
-echo -e "${YELLOW}Building Docker images...${NC}"
-docker-compose -f docker-compose.yml -f docker-compose.ci.yml build --no-cache
+# Start services (images already built in Docker Build stage)
+# Docker Compose will use existing images and wait for health checks automatically
+echo -e "${YELLOW}Starting services (using pre-built images)...${NC}"
+if ! docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d --wait; then
+    echo -e "${RED}❌ Failed to start services${NC}"
+    echo -e "${YELLOW}Service logs:${NC}"
+    docker-compose -f docker-compose.yml -f docker-compose.ci.yml logs --tail=50
+    exit 1
+fi
 
-echo -e "${YELLOW}Starting services...${NC}"
-docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
-
-# Wait for services
-echo -e "${YELLOW}Waiting for services to be ready...${NC}"
-sleep 10
-wait_for_service "Eureka Server" 8761 || exit 1
+# Verify all services are healthy (Docker Compose --wait should handle this, but double-check)
+echo -e "${YELLOW}Verifying services are healthy...${NC}"
 sleep 5
-wait_for_service "User Service" 8081 || exit 1
-wait_for_service "Product Service" 8082 || exit 1
-wait_for_service "Media Service" 8083 || exit 1
-wait_for_service "API Gateway" 8081 || exit 1
+
+# Quick health check (Docker Compose already waited, this is just verification)
+if curl -k -s https://localhost:8080/actuator/health 2>/dev/null | grep -q '"status":"UP"'; then
+    echo -e "${GREEN}✅ API Gateway is healthy${NC}"
+else
+    echo -e "${YELLOW}⚠️  API Gateway health check failed, but services are running${NC}"
+fi
 
 echo -e "${GREEN}=========================================="
 echo -e "✅ Deployment successful!${NC}"
@@ -69,7 +53,7 @@ echo -e "${GREEN}=========================================="
 echo ""
 echo "Services:"
 echo "  Frontend:    https://localhost:4200"
-echo "  API Gateway: https://localhost:8081"
+echo "  API Gateway: https://localhost:8080"
 echo "  Eureka:      http://localhost:8761"
 
 

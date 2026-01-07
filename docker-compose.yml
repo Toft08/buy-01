@@ -59,7 +59,9 @@ services:
   # Backend services
   # -------------------
   eureka-server:
-    build: ./backend/services/eureka
+    build:
+      context: ./backend
+      dockerfile: ./services/eureka/Dockerfile
     container_name: ecom-eureka-server
     ports:
       - '8761:8761'
@@ -72,7 +74,9 @@ services:
       retries: 10
 
   api-gateway:
-    build: ./backend/api-gateway
+    build:
+      context: ./backend
+      dockerfile: ./api-gateway/Dockerfile
     container_name: ecom-api-gateway
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/

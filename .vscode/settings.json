@@ -125,5 +125,7 @@
             "color": "#4ecdc4",
             "backgroundColor": "transparent"
         }
-    ]
+    ],
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

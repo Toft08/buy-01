@@ -1,0 +1,78 @@
+# Docker Compose override for CI/CD environment
+# This file extends docker-compose.yml with CI-specific settings
+
+services:
+  # Backend services with CI-specific configurations
+  eureka-server:
+    restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+  api-gateway:
+    restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+    environment:
+      - LOGGING_LEVEL_ROOT=INFO
+
+  user-service:
+    restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+    environment:
+      - LOGGING_LEVEL_ROOT=INFO
+
+  product-service:
+    restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+    environment:
+      - LOGGING_LEVEL_ROOT=INFO
+
+  media-service:
+    restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+    environment:
+      - LOGGING_LEVEL_ROOT=INFO
+
+  # Frontend with CI-specific settings
+  frontend:
+    restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+  # Infrastructure services
+  mongodb:
+    restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+  kafka:
+    restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'

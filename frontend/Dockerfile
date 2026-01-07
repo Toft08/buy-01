@@ -2,9 +2,13 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 
+# Copy package files first to cache npm dependencies
 COPY package*.json ./
-RUN npm ci
 
+# Install dependencies (this layer will be cached if package.json doesn't change)
+RUN npm ci --prefer-offline --no-audit
+
+# Copy source code (this invalidates cache only when code changes)
 COPY . .
 RUN npm run build
 

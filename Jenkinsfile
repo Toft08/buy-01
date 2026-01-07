@@ -74,7 +74,7 @@ pipeline {
                                 cp -r . /tmp/test/ && \
                                 cd /tmp/test && \
                                 npm install --legacy-peer-deps --cache /tmp/.npm --no-save --no-package-lock && \
-                                CHROME_BIN=/usr/bin/chromium npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+                                CHROME_BIN=/usr/bin/chromium npm run test
                               ' || {
                                 EXIT_CODE=$?
                                 echo "Frontend tests failed with exit code: $EXIT_CODE"

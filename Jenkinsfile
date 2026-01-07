@@ -56,17 +56,16 @@ pipeline {
                         sh '''
                             echo "Running frontend tests in isolated Chrome container..."
 
-                            # Get current user ID to avoid permission issues
-                            USER_ID=$(id -u)
-                            GROUP_ID=$(id -g)
-
                             docker run --rm \
-                              --user ${USER_ID}:${GROUP_ID} \
-                              -v ${WORKSPACE}/frontend:/workspace \
-                              -w /workspace \
+                              -v ${WORKSPACE}/frontend:/src:ro \
+                              -w /test \
                               --cap-add=SYS_ADMIN \
                               zenika/alpine-chrome:with-node \
-                              sh -c "npm install --legacy-peer-deps && CHROME_BIN=/usr/bin/chromium-browser npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage" || {
+                              sh -c "
+                                cp -r /src/. /test/ && \
+                                npm install --legacy-peer-deps && \
+                                CHROME_BIN=/usr/bin/chromium-browser npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+                              " || {
                                 EXIT_CODE=$?
                                 echo "Frontend tests failed with exit code: $EXIT_CODE"
                                 exit $EXIT_CODE

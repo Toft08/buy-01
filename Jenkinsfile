@@ -63,7 +63,7 @@ pipeline {
                               zenika/alpine-chrome:with-node \
                               sh -c "
                                 cd /workspace && \
-                                npm ci --cache /tmp/.npm --prefer-offline && \
+                                npm install --legacy-peer-deps --cache /tmp/.npm && \
                                 CHROME_BIN=/usr/bin/chromium-browser npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
                               " || {
                                 EXIT_CODE=$?

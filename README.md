@@ -5,6 +5,7 @@ Full-stack e-commerce platform built with Spring Boot microservices and Angular 
 ## Features
 
 **Backend (Spring Boot Microservices)**
+
 - User Management with CLIENT/SELLER roles
 - Product CRUD operations with ownership validation
 - Media upload with 2MB size limit and image validation
@@ -14,6 +15,7 @@ Full-stack e-commerce platform built with Spring Boot microservices and Angular 
 - API Gateway with WebFlux
 
 **Frontend (Angular 18)**
+
 - Product browsing and detail pages
 - Seller dashboard for product management
 - User profile with avatar support
@@ -21,6 +23,7 @@ Full-stack e-commerce platform built with Spring Boot microservices and Angular 
 - Responsive design with SCSS
 
 **Security**
+
 - BCrypt password hashing
 - HTTPS with self-signed certificates
 - HttpOnly cookies + localStorage
@@ -30,6 +33,7 @@ Full-stack e-commerce platform built with Spring Boot microservices and Angular 
 ## Quick Start with Docker (Recommended)
 
 ### Prerequisites
+
 - Docker and Docker Compose
 - 8GB+ RAM recommended
 
@@ -68,12 +72,14 @@ docker-compose down
 ## Manual Setup (without Docker)
 
 See detailed instructions in:
+
 - [Backend README](backend/README.md) - Backend services setup
 - [Frontend README](frontend/README.md) - Frontend setup
 
 ## Architecture
 
 ### Microservices
+
 ```
 ┌─────────────┐
 │   Angular   │ :4200 (nginx)
@@ -98,34 +104,38 @@ See detailed instructions in:
 
 ### Technology Stack
 
-| Layer | Technologies |
-|-------|-------------|
-| Frontend | Angular 18, TypeScript, SCSS, RxJS |
-| API Gateway | Spring Cloud Gateway, WebFlux |
-| Services | Spring Boot 3.2+, Java 17+ |
-| Database | MongoDB with authentication |
-| Messaging | Kafka 3.8.1 (KRaft mode) |
-| Security | JWT, BCrypt, HTTPS, HttpOnly cookies |
-| Container | Docker Compose, nginx (Alpine) |
+| Layer       | Technologies                         |
+| ----------- | ------------------------------------ |
+| Frontend    | Angular 18, TypeScript, SCSS, RxJS   |
+| API Gateway | Spring Cloud Gateway, WebFlux        |
+| Services    | Spring Boot 3.2+, Java 17+           |
+| Database    | MongoDB with authentication          |
+| Messaging   | Kafka 3.8.1 (KRaft mode)             |
+| Security    | JWT, BCrypt, HTTPS, HttpOnly cookies |
+| Container   | Docker Compose, nginx (Alpine)       |
 
 ## API Endpoints
 
 ### Authentication
+
 - `POST /auth/register` - Register new user (CLIENT or SELLER)
 - `POST /auth/login` - Login and receive JWT
 - `POST /auth/logout` - Logout and blacklist token
 
 ### Products (Public)
+
 - `GET /products` - List all products
 - `GET /products/{id}` - Get product details
 
 ### Products (Authenticated)
+
 - `POST /products` - Create product (SELLER only)
 - `PUT /products/{id}` - Update product (owner only)
 - `DELETE /products/{id}` - Delete product (owner only)
 - `GET /products/my-products` - Get user's products
 
 ### Media
+
 - `POST /media/upload/{productId}` - Upload image (SELLER, 2MB max)
 - `GET /media/product/{productId}` - Get product images
 - `DELETE /media/{mediaId}` - Delete image (owner only)
@@ -133,6 +143,7 @@ See detailed instructions in:
 ## Database Schema
 
 ### Users
+
 ```json
 {
   "_id": "ObjectId",
@@ -145,6 +156,7 @@ See detailed instructions in:
 ```
 
 ### Products
+
 ```json
 {
   "_id": "ObjectId",
@@ -158,6 +170,7 @@ See detailed instructions in:
 ```
 
 ### Media
+
 ```json
 {
   "_id": "ObjectId",
@@ -175,14 +188,18 @@ See detailed instructions in:
 ### Integration Tests (Recommended)
 
 ```bash
-# Run all 28 integration tests
-./run-tests.sh
+# Run all backend integration tests
+cd backend
+./mvnw test
 
 # Test specific service
 cd backend/services/user && ../../mvnw test
+cd backend/services/product && ../../mvnw test
+cd backend/services/media && ../../mvnw test
 ```
 
 **Test Coverage**: 28 tests using @SpringBootTest, MockMvc, and Testcontainers
+
 - User Service: 8 tests (registration, login, validation)
 - Product Service: 10 tests (CRUD, authorization)
 - Media Service: 10 tests (upload, download, limits)

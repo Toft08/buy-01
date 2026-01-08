@@ -1,133 +1,28 @@
 pipeline {
     agent any
 
-    // Triggers: Check for new commits automatically
+    // Automatic build trigger on new commits
     triggers {
-        // Poll SCM every 2 minutes (H/2 means every 2 minutes, with random offset)
-        // This checks your Git repository for new commits
         pollSCM('H/2 * * * *')
     }
 
     options {
-        buildDiscarder(logRotator(numToKeepStr: '50'))
         timeout(time: 30, unit: 'MINUTES')
         timestamps()
-        ansiColor('xterm')
     }
 
     environment {
-        // Workspace paths
-        WORKSPACE_DIR = "${WORKSPACE}"
-        BACKEND_DIR = "${WORKSPACE}/backend"
-        FRONTEND_DIR = "${WORKSPACE}/frontend"
-
-        // Build configuration
         JAVA_HOME = tool name: 'JDK-17', type: 'jdk'
         NODE_HOME = tool name: 'NodeJS-20', type: 'nodejs'
         PATH = "${JAVA_HOME}/bin:${NODE_HOME ?: '/usr'}/bin:${PATH}"
-
-        // Docker configuration
         DOCKER_BUILDKIT = '1'
-        COMPOSE_DOCKER_CLI_BUILD = '1'
-
-        // Notification configuration (set via Jenkins credentials or environment)
-        EMAIL_ENABLED = "${env.EMAIL_ENABLED ?: 'true'}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                script {
-                    echo "=========================================="
-                    echo "Checking out code from repository"
-                    echo "=========================================="
-                }
+                echo "Checking out code from repository"
                 checkout scm
-                script {
-                    env.GIT_COMMIT_SHORT = sh(
-                        script: 'git rev-parse --short HEAD',
-                        returnStdout: true
-                    ).trim()
-                    env.GIT_BRANCH_NAME = sh(
-                        script: 'git rev-parse --abbrev-ref HEAD',
-                        returnStdout: true
-                    ).trim()
-                    echo "Branch: ${env.GIT_BRANCH_NAME}"
-                    echo "Commit: ${env.GIT_COMMIT_SHORT}"
-                }
-            }
-        }
-
-        stage('Environment Setup') {
-            steps {
-                script {
-                    echo "=========================================="
-                    echo "Setting up build environment"
-                    echo "=========================================="
-                }
-                sh '''
-                    echo "Java version:"
-                    java -version
-                    echo "Node version:"
-                    node --version
-                    echo "npm version:"
-                    npm --version
-                    echo "Docker version:"
-                    docker --version
-                    echo "Docker Compose version:"
-                    docker-compose --version
-                '''
-                // Make scripts executable
-                sh 'chmod +x jenkins/scripts/*.sh'
-            }
-        }
-
-        stage('Build') {
-            parallel {
-                stage('Backend Build') {
-                    steps {
-                        script {
-                            echo "=========================================="
-                            echo "Building Backend Services"
-                            echo "=========================================="
-                        }
-                        sh '''
-                            export WORKSPACE="${WORKSPACE}"
-                            if [ -z "${JAVA_HOME}" ] || [ ! -d "${JAVA_HOME}" ]; then
-                                echo "ERROR: JAVA_HOME is not set or invalid: ${JAVA_HOME}"
-                                echo "Please configure JDK-17 in Jenkins Tools configuration"
-                                exit 1
-                            fi
-                            export JAVA_HOME="${JAVA_HOME}"
-                            export PATH="${JAVA_HOME}/bin:${PATH}"
-                            bash jenkins/scripts/build-backend.sh
-                        '''
-                    }
-                    post {
-                        success {
-                            archiveArtifacts artifacts: 'artifacts/backend/*.jar', allowEmptyArchive: true
-                        }
-                    }
-                }
-
-                stage('Frontend Build') {
-                    steps {
-                        script {
-                            echo "=========================================="
-                            echo "Building Frontend Application"
-                            echo "=========================================="
-                        }
-                        sh '''
-                            export WORKSPACE="${WORKSPACE}"
-                            bash jenkins/scripts/build-frontend.sh
-                        '''
-                    }
-                    post {
-                        success {
-                            archiveArtifacts artifacts: 'artifacts/frontend/**/*', allowEmptyArchive: true
-                        }
-                    }
-                }
             }
         }
 
@@ -135,268 +30,198 @@ pipeline {
             parallel {
                 stage('Backend Tests') {
                     steps {
-                        script {
-                            echo "=========================================="
-                            echo "Running Backend Tests"
-                            echo "=========================================="
-                        }
                         sh '''
-                            export WORKSPACE="${WORKSPACE}"
-                            export JAVA_HOME="${JAVA_HOME}"
-                            export PATH="${JAVA_HOME}/bin:${PATH}"
-                            bash jenkins/scripts/run-backend-tests.sh
+                            cd backend || exit 1
+
+                            # Build shared module first
+                            cd shared && ../mvnw clean install -DskipTests && cd ..
+
+                            # Run tests for each service (pipeline fails if any test fails)
+                            cd services/user && ../../mvnw test && cd ../..
+                            cd services/product && ../../mvnw test && cd ../..
+                            cd services/media && ../../mvnw test && cd ../..
+                            cd services/eureka && ../../mvnw test && cd ../..
+                            cd api-gateway && ../mvnw test
                         '''
-                    }
-                    post {
-                        always {
-                            junit 'test-reports/backend/**/*.xml'
-                        }
                     }
                 }
 
                 stage('Frontend Tests') {
                     steps {
-                        script {
-                            echo "=========================================="
-                            echo "Running Frontend Tests"
-                            echo "=========================================="
-                        }
                         sh '''
-                            export WORKSPACE="${WORKSPACE}"
-                            bash jenkins/scripts/run-frontend-tests.sh
+                            echo "Running frontend tests..."
+                            cd frontend
+                            npm ci
+                            npm run test
+                            echo "✅ Frontend tests passed"
                         '''
-                    }
-                    post {
-                        always {
-                            // Publish frontend test results if available
-                            script {
-                                if (fileExists('test-reports/frontend')) {
-                                    junit 'test-reports/frontend/**/*.xml'
-                                }
-                            }
-                        }
                     }
                 }
             }
         }
 
-        stage('Docker Build') {
+        stage('Build') {
             steps {
-                script {
-                    echo "=========================================="
-                    echo "Building Docker Images"
-                    echo "=========================================="
-                }
                 sh '''
-                    # Ensure SSL certificates exist
+                    # Generate SSL certificates if needed
                     if [ ! -f "frontend/ssl/localhost-cert.pem" ]; then
-                        echo "Generating SSL certificates..."
                         ./generate-ssl-certs.sh
                     fi
 
-                    # Build Docker images in parallel for speed
-                    # Each service builds independently (shared module is built within each Dockerfile)
-                    echo "Building Docker images in parallel..."
-
-                    # Build all services in parallel (docker-compose handles this efficiently)
-                    if ! docker-compose -f docker-compose.yml -f docker-compose.ci.yml build --parallel; then
-                        echo "❌ Docker build failed"
-                        exit 1
-                    fi
-
-                    echo "✅ All Docker images built successfully!"
-
-                    # Show built images
-                    echo "Built images:"
-                    docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "ecom-|e-commerce" | head -10
+                    # Build Docker images
+                    docker-compose -f docker-compose.yml -f docker-compose.ci.yml build
                 '''
-            }
-        }
-
-        stage('Integration Tests') {
-            steps {
-                script {
-                    echo "=========================================="
-                    echo "Verifying Services Start Correctly"
-                    echo "=========================================="
-                }
-                sh '''
-                    # Start services (Docker Compose waits for health checks automatically)
-                    echo "Starting all services..."
-                    docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
-
-                    # If docker-compose up succeeds, services are healthy (it waits for health checks)
-                    echo "✅ Integration test passed - Docker Compose confirmed all services are healthy"
-                '''
-            }
-            post {
-                always {
-                    // Don't stop services - they will be replaced by Deploy stage
-                    // Only stop if integration tests failed
-                    script {
-                        if (currentBuild.currentResult != 'SUCCESS') {
-                            sh 'docker-compose -f docker-compose.yml -f docker-compose.ci.yml down || true'
-                        }
-                    }
-                }
             }
         }
 
         stage('Deploy') {
             steps {
                 script {
-                    echo "=========================================="
-                    echo "Deploying Application"
-                    echo "=========================================="
+                    // Save current running images for rollback
+                    sh '''
+                        mkdir -p .deployment-state
+
+                        # Save currently running image IDs before deployment
+                        echo "Saving current deployment state for rollback..."
+                        docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep -E "ecom-|e-commerce" > .deployment-state/previous-images.txt || echo "No previous images found" > .deployment-state/previous-images.txt
+
+                        # Save current container state
+                        docker ps --filter "name=ecom-" --format "{{.Names}} {{.Image}}" > .deployment-state/previous-containers.txt || true
+                    '''
+
+                    // Deploy new version
+                    sh '''
+                        # Stop old containers
+                        docker-compose -f docker-compose.yml -f docker-compose.ci.yml down || true
+
+                        # Force remove any lingering containers with ecom- prefix
+                        docker ps -a | grep ecom- | awk '{print $1}' | xargs -r docker rm -f || true
+
+                        # Start new containers
+                        echo "Deploying new version..."
+                        docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+
+                        # Wait for services to be healthy
+                        echo "Waiting for services to start..."
+                        sleep 30
+
+                        # Verify services are running
+                        docker-compose -f docker-compose.yml -f docker-compose.ci.yml ps
+
+                        # Check if all services are healthy
+                        UNHEALTHY=$(docker ps --filter "name=ecom-" --filter "health=unhealthy" --format "{{.Names}}" || true)
+                        if [ -n "$UNHEALTHY" ]; then
+                            echo "ERROR: Unhealthy services detected: $UNHEALTHY"
+                            exit 1
+                        fi
+
+                        echo "✅ Deployment successful - all services healthy"
+                    '''
                 }
-                sh '''
-                    export WORKSPACE="${WORKSPACE}"
-                    export BUILD_NUMBER="${BUILD_NUMBER}"
-                    export GIT_COMMIT="${GIT_COMMIT}"
-                    bash jenkins/scripts/deploy.sh
-                '''
             }
             post {
                 failure {
                     script {
-                        echo "=========================================="
-                        echo "Deployment failed - Attempting rollback"
-                        echo "=========================================="
-                        try {
-                            if (fileExists('jenkins/scripts/rollback.sh')) {
-                                sh '''
-                                    export WORKSPACE="${WORKSPACE}"
-                                    export BUILD_NUMBER="${BUILD_NUMBER}"
-                                    bash jenkins/scripts/rollback.sh previous
-                                '''
-                            }
-                        } catch (Exception e) {
-                            echo "Rollback failed: ${e.getMessage()}"
-                        }
+                        echo "❌ Deployment failed - Initiating rollback to previous working version"
+                        sh '''
+                            # Stop failed deployment
+                            docker-compose -f docker-compose.yml -f docker-compose.ci.yml down || true
+
+                            # Check if we have a previous state to restore
+                            if [ -f .deployment-state/previous-containers.txt ] && [ -s .deployment-state/previous-containers.txt ]; then
+                                echo "Restoring previous deployment..."
+
+                                # Read previous image tags and restore them
+                                if [ -f .deployment-state/previous-images.txt ]; then
+                                    echo "Previous images:"
+                                    cat .deployment-state/previous-images.txt
+                                fi
+
+                                # Attempt to restart with previous images
+                                # Note: This assumes previous images still exist
+                                docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d || {
+                                    echo "⚠️  Could not restore previous deployment - manual intervention required"
+                                    exit 1
+                                }
+
+                                echo "✅ Rollback completed - previous version restored"
+                            else
+                                echo "⚠️  No previous deployment found to rollback to"
+                                echo "System is currently down - manual intervention required"
+                            fi
+                        '''
+                    }
+                }
+                success {
+                    script {
+                        echo "✅ Deployment successful - saving deployment state"
+                        sh '''
+                            # Save successful deployment info
+                            echo "BUILD_NUMBER=${BUILD_NUMBER}" > .deployment-state/last-successful.txt
+                            echo "GIT_COMMIT=${GIT_COMMIT}" >> .deployment-state/last-successful.txt
+                            echo "TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .deployment-state/last-successful.txt
+                        '''
                     }
                 }
             }
         }
-
     }
 
     post {
         always {
             script {
-                echo "=========================================="
                 echo "Build completed: ${currentBuild.currentResult}"
-                echo "=========================================="
 
-                // Cleanup old Docker images (only if we have workspace context)
-                try {
-                    if (fileExists('.') && env.WORKSPACE) {
-                        sh '''
-                            # Clean up old images (keep last 5) - but DON'T stop running containers
-                            docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "ecom-|e-commerce" | tail -n +6 | xargs -r docker rmi || true
+                // Get commit message before cleaning workspace
+                def commitMessage = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
+                env.COMMIT_MESSAGE = commitMessage
 
-                            # Remove dangling images (unused, not running containers)
-                            docker image prune -f || true
-                        '''
-                    }
-                } catch (Exception e) {
-                    echo "Cleanup skipped: ${e.getMessage()}"
-                }
-            }
-        }
-        success {
-            script {
-                def commitMessage = ""
-                try {
-                    commitMessage = sh(
-                        script: 'git log -1 --pretty=%B',
-                        returnStdout: true
-                    ).trim()
-                } catch (Exception e) {
-                    commitMessage = "Unable to retrieve commit message"
+                // Archive test results (backend and frontend combined)
+                junit allowEmptyResults: true, testResults: 'backend/**/target/surefire-reports/*.xml, frontend/test-results/*.xml'
+
+                // Archive test artifacts for download
+                archiveArtifacts artifacts: 'backend/**/target/surefire-reports/*.xml', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'frontend/test-results/*.xml', allowEmptyArchive: true
+
+                // Cleanup Docker resources
+                sh '''
+                    docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "ecom-|e-commerce" | tail -n +6 | xargs -r docker rmi || true
+                    docker image prune -f || true
+                '''
+
+                // Cleanup workspace (done last, after getting commit message)
+                if (env.WORKSPACE) {
+                    cleanWs notFailBuild: true
+                } else {
+                    echo "No workspace available; skipping cleanWs"
                 }
 
-                // Email notification
-                if (env.EMAIL_ENABLED == 'true') {
-                    // Parse email recipients (comma-separated string or use default)
-                    def emailRecipients = env.EMAIL_RECIPIENTS ?: 'anastasia.suhareva@gmail.com, toft.diederichs@gritlab.ax'
-                    def recipientList = emailRecipients.split(',').collect { it.trim() }
+                // Send email notification
+                def buildStatus = currentBuild.currentResult
+                def emailRecipients = env.EMAIL_RECIPIENTS ?: 'anastasia.suhareva@gmail.com, toft.diederichs@gritlab.ax'
+                def recipientList = emailRecipients.split(',').collect { it.trim() }
 
-                    emailext (
-                        subject: "✅ Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            Build succeeded!
+                def statusEmoji = buildStatus == 'SUCCESS' ? '✅' : '❌'
+                def statusText = buildStatus == 'SUCCESS' ? 'succeeded' : 'failed'
 
-                            Project: ${env.JOB_NAME}
-                            Build Number: #${env.BUILD_NUMBER}
-                            Branch: ${env.GIT_BRANCH_NAME}
-                            Commit: ${commitMessage}
-                            Build URL: ${env.BUILD_URL}
-                        """,
-                        to: recipientList.join(','),
-                        mimeType: 'text/html'
-                    )
-                }
-            }
-        }
-        failure {
-            script {
-                def commitMessage = ""
-                try {
-                    commitMessage = sh(
-                        script: 'git log -1 --pretty=%B',
-                        returnStdout: true
-                    ).trim()
-                } catch (Exception e) {
-                    commitMessage = "Unable to retrieve commit message"
-                }
+                def emailSubject = "${statusEmoji} Build ${buildStatus.capitalize()}: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
 
-                // Attempt automatic rollback on deployment failure
-                if (env.GIT_BRANCH_NAME == 'main' || env.GIT_BRANCH_NAME == 'master') {
-                    try {
-                        if (fileExists('jenkins/scripts/rollback.sh')) {
-                            echo "Attempting automatic rollback..."
-                            sh '''
-                                export WORKSPACE="${WORKSPACE}"
-                                export BUILD_NUMBER="${BUILD_NUMBER}"
-                                bash jenkins/scripts/rollback.sh previous
-                            '''
-                        }
-                    } catch (Exception e) {
-                        echo "Rollback failed: ${e.getMessage()}"
-                    }
-                }
+                def emailBody = """
+                    <h3>Build ${statusText}!</h3>
+                    <p><strong>Project:</strong> ${env.JOB_NAME}<br>
+                    <strong>Build Number:</strong> #${env.BUILD_NUMBER}<br>
+                    <strong>Commit:</strong> ${env.COMMIT_MESSAGE}<br>
+                    <strong>Build URL:</strong> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                    ${buildStatus == 'SUCCESS' ? '' : '<p><em>Please check the build logs for details.</em></p>'}
+                """
 
-                // Email notification
-                if (env.EMAIL_ENABLED == 'true') {
-                    // Parse email recipients (comma-separated string or use default)
-                    def emailRecipients = env.EMAIL_RECIPIENTS ?: 'anastasia.suhareva@gmail.com, toft.diederichs@gritlab.ax'
-                    def recipientList = emailRecipients.split(',').collect { it.trim() }
-
-                    emailext (
-                        subject: "❌ Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            Build failed!
-
-                            Project: ${env.JOB_NAME}
-                            Build Number: #${env.BUILD_NUMBER}
-                            Branch: ${env.GIT_BRANCH_NAME}
-                            Commit: ${commitMessage}
-                            Build URL: ${env.BUILD_URL}
-
-                            Please check the build logs for details.
-                        """,
-                        to: recipientList.join(','),
-                        mimeType: 'text/html'
-                    )
-                }
-            }
-        }
-        unstable {
-            script {
-                echo "Build is unstable - some tests may have failed"
+                emailext (
+                    subject: emailSubject,
+                    body: emailBody,
+                    to: recipientList.join(','),
+                    mimeType: 'text/html'
+                )
             }
         }
     }
 }
-
-

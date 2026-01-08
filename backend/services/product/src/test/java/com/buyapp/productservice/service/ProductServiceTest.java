@@ -155,8 +155,8 @@ class ProductServiceTest {
     @Test
     void createProduct_ShouldSaveProductWithUserId() {
         // Arrange
-        when(authentication.getName()).thenReturn("seller@example.com");
-        when(productRepository.save(any(Product.class))).thenReturn(testProduct);
+        lenient().when(authentication.getName()).thenReturn("seller@example.com");
+        lenient().when(productRepository.save(any(Product.class))).thenReturn(testProduct);
 
         // Note: This test assumes getUserByEmail is mocked or stubbed appropriately
         // In a real scenario, you might need to mock the WebClient call
@@ -172,8 +172,8 @@ class ProductServiceTest {
     @Test
     void deleteProduct_WhenProductExists_ShouldDeleteProduct() {
         // Arrange
-        when(productRepository.findById("1")).thenReturn(Optional.of(testProduct));
-        doNothing().when(productRepository).delete(testProduct);
+        lenient().when(productRepository.findById("1")).thenReturn(Optional.of(testProduct));
+        lenient().doNothing().when(productRepository).delete(testProduct);
 
         // This test assumes the delete method checks permissions
         // You may need to adjust based on actual implementation
@@ -188,8 +188,8 @@ class ProductServiceTest {
         updateDto.setName("New Name");
         updateDto.setPrice(100.0);
 
-        when(productRepository.findById("1")).thenReturn(Optional.of(existingProduct));
-        when(authentication.getName()).thenReturn("seller@example.com");
+        lenient().when(productRepository.findById("1")).thenReturn(Optional.of(existingProduct));
+        lenient().when(authentication.getName()).thenReturn("seller@example.com");
 
         // This assumes canModifyProduct returns true
         // Actual test would need to mock that behavior

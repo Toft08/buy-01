@@ -52,8 +52,21 @@ pipeline {
                             echo "Running frontend tests..."
                             cd frontend
                             npm ci
-                            npm run test
-                            echo "✅ Frontend tests passed"
+                            npm run test || TEST_EXIT=$?
+
+                            # Debug: Check if junit.xml was created
+                            echo "Checking for test results..."
+                            if [ -f "test-results/junit.xml" ]; then
+                                echo "✅ junit.xml found"
+                                ls -lh test-results/junit.xml
+                            else
+                                echo "❌ junit.xml NOT found!"
+                                echo "Contents of test-results dir:"
+                                ls -la test-results/ || echo "test-results directory doesn't exist"
+                            fi
+
+                            # Exit with test failure code if tests failed
+                            exit ${TEST_EXIT:-0}
                         '''
                     }
                 }

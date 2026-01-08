@@ -49,7 +49,7 @@ pipeline {
                 stage('Frontend Tests') {
                     steps {
                         sh '''
-                            echo "Running frontend tests in isolated Chrome container..."
+                            echo "Running frontend tests..."
 
                             docker run --rm \
                               --volumes-from jenkins \
@@ -57,20 +57,16 @@ pipeline {
                               -e WORKSPACE=${WORKSPACE} \
                               --tmpfs /tmp:rw,exec,nosuid,size=2g \
                               --cap-add=SYS_ADMIN \
-                              node:22-slim \
+                              buildkite/puppeteer:latest \
                               bash -c '
-                                echo "Installing Chrome and dependencies..." && \
-                                apt-get update && \
-                                apt-get install -y chromium chromium-driver --no-install-recommends && \
-                                apt-get clean && \
-                                rm -rf /var/lib/apt/lists/* && \
                                 echo "Node version: $(node --version)" && \
+                                echo "Chrome version: $(google-chrome --version)" && \
                                 echo "Copying files to /tmp..." && \
                                 mkdir -p /tmp/test && \
                                 cp -r . /tmp/test/ && \
                                 cd /tmp/test && \
                                 npm install --legacy-peer-deps --cache /tmp/.npm --no-save --no-package-lock && \
-                                CHROME_BIN=/usr/bin/chromium npm run test && \
+                                npm run test && \
                                 echo "Copying test results back to workspace..." && \
                                 mkdir -p ${WORKSPACE}/frontend/test-results && \
                                 cp -r test-results/* ${WORKSPACE}/frontend/test-results/ && \

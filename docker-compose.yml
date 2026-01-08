@@ -59,9 +59,7 @@ services:
   # Backend services
   # -------------------
   eureka-server:
-    build:
-      context: ./backend
-      dockerfile: ./services/eureka/Dockerfile
+    build: ./backend/services/eureka
     container_name: ecom-eureka-server
     ports:
       - '8761:8761'
@@ -74,9 +72,7 @@ services:
       retries: 10
 
   api-gateway:
-    build:
-      context: ./backend
-      dockerfile: ./api-gateway/Dockerfile
+    build: ./backend/api-gateway
     container_name: ecom-api-gateway
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
@@ -101,9 +97,7 @@ services:
         condition: service_healthy
 
   user-service:
-    build:
-      context: ./backend
-      dockerfile: ./services/user/Dockerfile
+    build: ./backend/services/user
     container_name: ecom-user-service
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
@@ -131,9 +125,7 @@ services:
         condition: service_healthy
 
   product-service:
-    build:
-      context: ./backend
-      dockerfile: ./services/product/Dockerfile
+    build: ./backend/services/product
     container_name: ecom-product-service
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
@@ -161,9 +153,7 @@ services:
         condition: service_healthy
 
   media-service:
-    build:
-      context: ./backend
-      dockerfile: ./services/media/Dockerfile
+    build: ./backend/services/media
     container_name: ecom-media-service
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/

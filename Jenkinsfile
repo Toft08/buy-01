@@ -3,7 +3,7 @@ pipeline {
 
     // Automatic build trigger on new commits
     triggers {
-        pollSCM('H/2 * * * *')
+        pollSCM('H/1 * * * *')
     }
 
     options {

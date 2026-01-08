@@ -34,6 +34,8 @@ module.exports = function (config) {
       classNameFormatter: function (browser, result) {
         return 'frontend.' + (result.suite[0] || 'tests');
       },
+      stdOut: true,
+      stdErr: true,
     },
     reporters: ['progress', 'kjhtml', 'coverage', 'junit'],
     port: 9876,

@@ -59,6 +59,58 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Ensure SonarQube is running
+                    sh '''
+                        echo "Checking SonarQube availability..."
+                        SONAR_URL="http://localhost:9000"
+                        
+                        if ! curl -f -s "$SONAR_URL/api/system/status" > /dev/null 2>&1; then
+                            echo "⚠️  SonarQube is not running at $SONAR_URL"
+                            echo "Please start SonarQube: cd sonarqube && docker-compose up -d"
+                            exit 1
+                        fi
+                        
+                        echo "✅ SonarQube is available"
+                    '''
+                    
+                    // Run SonarQube analysis with quality profile
+                    withSonarQubeEnv('SonarQube') {
+                        sh '''
+                            cd backend
+                            
+                            echo "Running SonarQube analysis..."
+                            mvn clean verify sonar:sonar \
+                                -Dsonar.projectKey=e-com-backend \
+                                -Dsonar.projectName="E-commerce Backend" \
+                                -Dsonar.host.url=http://localhost:9000 \
+                                -Dsonar.java.binaries=target/classes \
+                                -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                script {
+                    echo "Waiting for SonarQube Quality Gate result..."
+                    timeout(time: 5, unit: 'MINUTES') {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "❌ Quality Gate failed: ${qg.status}\n" +
+                                  "Please check SonarQube dashboard at http://localhost:9000 for details."
+                        } else {
+                            echo "✅ Quality Gate passed successfully!"
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 sh '''

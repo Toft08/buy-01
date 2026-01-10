@@ -83,7 +83,7 @@ pipeline {
             steps {
                 echo '🚦 Checking SonarQube Quality Gate...'
 
-                // Wait for quality gate result (timeout after 5 minutes)
+                // TODO! wait for quality gate result (timeout after 5 minutes)
                 timeout(time: 5, unit: 'MINUTES') {
                     withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
                         sh '''

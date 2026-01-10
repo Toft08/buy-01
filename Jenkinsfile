@@ -196,13 +196,13 @@ pipeline {
                                 # Attempt to restart with previous images
                                 # Note: This assumes previous images still exist
                                 docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d || {
-                                    echo "⚠️  Could not restore previous deployment - manual intervention required"
+                                    echo "Could not restore previous deployment - manual intervention required"
                                     exit 1
                                 }
 
-                                echo "✅ Rollback completed - previous version restored"
+                                echo "Rollback completed - previous version restored"
                             else
-                                echo "⚠️  No previous deployment found to rollback to"
+                                echo "No previous deployment found to rollback to"
                                 echo "System is currently down - manual intervention required"
                             fi
                         '''

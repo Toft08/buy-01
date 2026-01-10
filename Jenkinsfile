@@ -73,14 +73,7 @@ pipeline {
                             -Dsonar.projectName="safe-zone" \
                             -Dsonar.host.url=http://host.docker.internal:9000 \
                             -Dsonar.token=${SONAR_TOKEN} \
-                            -Dsonar.sources=shared/src/main/java,services/user/src/main/java,services/product/src/main/java,services/media/src/main/java,services/eureka/src/main/java,api-gateway/src/main/java,../frontend/src/app \
-                            -Dsonar.tests=services/user/src/test/java,services/product/src/test/java,services/media/src/test/java,services/eureka/src/test/java \
-                            -Dsonar.java.binaries=shared/target/classes,services/user/target/classes,services/product/target/classes,services/media/target/classes,services/eureka/target/classes,api-gateway/target/classes \
-                            -Dsonar.java.source=17 \
-                            -Dsonar.typescript.lcov.reportPaths=../frontend/coverage/lcov.info \
-                            -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts,**/test/**,**/dist/** \
-                            -Dsonar.test.inclusions=**/*.spec.ts,**/src/test/java/**/*.java \
-                            -q
+                            -Dsonar.java.source=17
                     '''
                 }
             }

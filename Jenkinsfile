@@ -59,6 +59,66 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                echo '🔍 Running SonarQube analysis...'
+
+                // Use SonarQube token from Jenkins credentials
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                    // Analyze all backend services AND frontend with explicit source paths
+                    sh '''
+                        cd backend
+                        ./mvnw sonar:sonar \
+                            -Dsonar.projectKey=safe-zone \
+                            -Dsonar.projectName="safe-zone" \
+                            -Dsonar.host.url=http://host.docker.internal:9000 \
+                            -Dsonar.token=${SONAR_TOKEN} \
+                            -Dsonar.sources=shared/src/main/java,services/user/src/main/java,services/product/src/main/java,services/media/src/main/java,services/eureka/src/main/java,api-gateway/src/main/java,../frontend/src/app \
+                            -Dsonar.tests=services/user/src/test/java,services/product/src/test/java,services/media/src/test/java,services/eureka/src/test/java \
+                            -Dsonar.java.binaries=shared/target/classes,services/user/target/classes,services/product/target/classes,services/media/target/classes,services/eureka/target/classes,api-gateway/target/classes \
+                            -Dsonar.java.source=17 \
+                            -Dsonar.typescript.lcov.reportPaths=../frontend/coverage/lcov.info \
+                            -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts,**/test/**,**/dist/** \
+                            -Dsonar.test.inclusions=**/*.spec.ts,**/src/test/java/**/*.java \
+                            -q
+                    '''
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                echo '🚦 Checking SonarQube Quality Gate...'
+
+                // Wait for quality gate result (timeout after 5 minutes)
+                timeout(time: 5, unit: 'MINUTES') {
+                    withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                        sh """
+                            echo "Waiting for SonarQube analysis to complete..."
+                            sleep 10
+
+                            # Check quality gate status
+                            RESPONSE=\$(curl -s -u "${SONAR_TOKEN}:" \\
+                                "http://host.docker.internal:9000/api/qualitygates/project_status?projectKey=safe-zone")
+
+                            echo "API Response: \${RESPONSE}"
+
+                            QUALITY_GATE=\$(echo "\${RESPONSE}" | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4)
+
+                            echo "Quality Gate Status: \${QUALITY_GATE}"
+
+                            if [ "\${QUALITY_GATE}" != "OK" ]; then
+                                echo "❌ Quality Gate FAILED!"
+                                exit 1
+                            else
+                                echo "✅ Quality Gate PASSED!"
+                            fi
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 sh '''

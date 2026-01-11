@@ -34,11 +34,12 @@ uploads/
 **/uploads/
 
 # SSL certificates and private keys (self-signed for development)
-*.p12
-*.pem
-**/ssl/*.pem
-**/ssl/*.key
-frontend/ssl/
+# Commented out to allow committing self-signed certs for CI/CD demo
+# *.p12
+# *.pem
+# **/ssl/*.pem
+# **/ssl/*.key
+# frontend/ssl/
 backend/**/keystore.p12
 
 # Jenkins deployment state (for rollback)

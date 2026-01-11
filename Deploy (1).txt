@@ -1,0 +1,128 @@
+[2026-01-11T17:37:58.490Z] + mkdir -p .deployment-state
+[2026-01-11T17:37:58.492Z] + echo Saving current deployment state for rollback...
+[2026-01-11T17:37:58.492Z] Saving current deployment state for rollback...
+[2026-01-11T17:37:58.492Z] + docker images --format {{.Repository}}:{{.Tag}} {{.ID}}
+[2026-01-11T17:37:58.492Z] + grep -E ecom-|e-commerce
+[2026-01-11T17:37:59.046Z] + echo No previous images found
+[2026-01-11T17:37:59.046Z] + docker ps --filter name=ecom- --format {{.Names}} {{.Image}}
+[2026-01-11T17:37:59.397Z] + docker-compose -f docker-compose.yml -f docker-compose.ci.yml down
+[2026-01-11T17:37:59.650Z]  Container ecom-kafka  Stopping
+[2026-01-11T17:37:59.650Z]  Container ecom-frontend  Stopping
+[2026-01-11T17:37:59.902Z]  Container ecom-frontend  Stopped
+[2026-01-11T17:37:59.902Z]  Container ecom-frontend  Removing
+[2026-01-11T17:37:59.902Z]  Container ecom-frontend  Removed
+[2026-01-11T17:37:59.902Z]  Container ecom-api-gateway  Stopping
+[2026-01-11T17:38:01.256Z]  Container ecom-kafka  Stopped
+[2026-01-11T17:38:01.256Z]  Container ecom-kafka  Removing
+[2026-01-11T17:38:01.256Z]  Container ecom-kafka  Removed
+[2026-01-11T17:38:01.536Z]  Container ecom-api-gateway  Stopped
+[2026-01-11T17:38:01.536Z]  Container ecom-api-gateway  Removing
+[2026-01-11T17:38:01.790Z]  Container ecom-api-gateway  Removed
+[2026-01-11T17:38:01.790Z]  Container ecom-product-service  Stopping
+[2026-01-11T17:38:01.790Z]  Container ecom-media-service  Stopping
+[2026-01-11T17:38:01.790Z]  Container ecom-user-service  Stopping
+[2026-01-11T17:38:03.317Z]  Container ecom-media-service  Stopped
+[2026-01-11T17:38:03.317Z]  Container ecom-media-service  Removing
+[2026-01-11T17:38:03.317Z]  Container ecom-user-service  Stopped
+[2026-01-11T17:38:03.317Z]  Container ecom-user-service  Removing
+[2026-01-11T17:38:03.317Z]  Container ecom-product-service  Stopped
+[2026-01-11T17:38:03.317Z]  Container ecom-product-service  Removing
+[2026-01-11T17:38:03.317Z]  Container ecom-media-service  Removed
+[2026-01-11T17:38:03.570Z]  Container ecom-user-service  Removed
+[2026-01-11T17:38:03.570Z]  Container ecom-product-service  Removed
+[2026-01-11T17:38:03.570Z]  Container ecom-mongodb  Stopping
+[2026-01-11T17:38:03.570Z]  Container ecom-eureka-server  Stopping
+[2026-01-11T17:38:04.140Z]  Container ecom-mongodb  Stopped
+[2026-01-11T17:38:04.140Z]  Container ecom-mongodb  Removing
+[2026-01-11T17:38:04.394Z]  Container ecom-mongodb  Removed
+[2026-01-11T17:38:04.958Z]  Container ecom-eureka-server  Stopped
+[2026-01-11T17:38:04.958Z]  Container ecom-eureka-server  Removing
+[2026-01-11T17:38:04.958Z]  Container ecom-eureka-server  Removed
+[2026-01-11T17:38:04.958Z]  Network e-com-pipeline_ecom-network  Removing
+[2026-01-11T17:38:05.212Z]  Network e-com-pipeline_ecom-network  Removed
+[2026-01-11T17:38:05.212Z] + docker ps -a
+[2026-01-11T17:38:05.212Z] + grep ecom-
+[2026-01-11T17:38:05.212Z] + awk {print $1}
+[2026-01-11T17:38:05.212Z] + xargs -r docker rm -f
+[2026-01-11T17:38:05.775Z] + echo Deploying new version...
+[2026-01-11T17:38:05.775Z] Deploying new version...
+[2026-01-11T17:38:05.775Z] + docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+[2026-01-11T17:38:06.330Z]  Network e-com-pipeline_ecom-network  Creating
+[2026-01-11T17:38:06.331Z]  Network e-com-pipeline_ecom-network  Created
+[2026-01-11T17:38:06.331Z]  Container ecom-mongodb  Creating
+[2026-01-11T17:38:06.331Z]  Container ecom-kafka  Creating
+[2026-01-11T17:38:06.331Z]  Container ecom-eureka-server  Creating
+[2026-01-11T17:38:06.589Z]  Container ecom-eureka-server  Created
+[2026-01-11T17:38:06.589Z]  Container ecom-mongodb  Created
+[2026-01-11T17:38:06.589Z]  Container ecom-product-service  Creating
+[2026-01-11T17:38:06.589Z]  Container ecom-user-service  Creating
+[2026-01-11T17:38:06.589Z]  Container ecom-media-service  Creating
+[2026-01-11T17:38:06.589Z]  Container ecom-kafka  Created
+[2026-01-11T17:38:06.881Z]  Container ecom-product-service  Created
+[2026-01-11T17:38:06.881Z]  Container ecom-media-service  Created
+[2026-01-11T17:38:06.881Z]  Container ecom-user-service  Created
+[2026-01-11T17:38:06.881Z]  Container ecom-api-gateway  Creating
+[2026-01-11T17:38:07.439Z]  Container ecom-api-gateway  Created
+[2026-01-11T17:38:07.439Z]  Container ecom-frontend  Creating
+[2026-01-11T17:38:07.779Z]  Container ecom-frontend  Created
+[2026-01-11T17:38:07.779Z]  Container ecom-mongodb  Starting
+[2026-01-11T17:38:07.779Z]  Container ecom-kafka  Starting
+[2026-01-11T17:38:07.779Z]  Container ecom-eureka-server  Starting
+[2026-01-11T17:38:08.368Z]  Container ecom-mongodb  Started
+[2026-01-11T17:38:08.368Z]  Container ecom-kafka  Started
+[2026-01-11T17:38:08.621Z]  Container ecom-eureka-server  Started
+[2026-01-11T17:38:08.621Z]  Container ecom-eureka-server  Waiting
+[2026-01-11T17:38:08.621Z]  Container ecom-mongodb  Waiting
+[2026-01-11T17:38:08.621Z]  Container ecom-eureka-server  Waiting
+[2026-01-11T17:38:08.621Z]  Container ecom-mongodb  Waiting
+[2026-01-11T17:38:08.621Z]  Container ecom-eureka-server  Waiting
+[2026-01-11T17:38:08.621Z]  Container ecom-mongodb  Waiting
+[2026-01-11T17:38:16.749Z]  Container ecom-mongodb  Healthy
+[2026-01-11T17:38:16.749Z]  Container ecom-mongodb  Healthy
+[2026-01-11T17:38:16.749Z]  Container ecom-mongodb  Healthy
+[2026-01-11T17:38:24.831Z]  Container ecom-eureka-server  Healthy
+[2026-01-11T17:38:24.832Z]  Container ecom-user-service  Starting
+[2026-01-11T17:38:24.832Z]  Container ecom-eureka-server  Healthy
+[2026-01-11T17:38:24.832Z]  Container ecom-media-service  Starting
+[2026-01-11T17:38:24.832Z]  Container ecom-eureka-server  Healthy
+[2026-01-11T17:38:24.832Z]  Container ecom-product-service  Starting
+[2026-01-11T17:38:25.103Z]  Container ecom-product-service  Started
+[2026-01-11T17:38:25.103Z]  Container ecom-user-service  Started
+[2026-01-11T17:38:25.103Z]  Container ecom-media-service  Started
+[2026-01-11T17:38:25.103Z]  Container ecom-media-service  Waiting
+[2026-01-11T17:38:25.103Z]  Container ecom-eureka-server  Waiting
+[2026-01-11T17:38:25.103Z]  Container ecom-user-service  Waiting
+[2026-01-11T17:38:25.103Z]  Container ecom-product-service  Waiting
+[2026-01-11T17:38:25.725Z]  Container ecom-eureka-server  Healthy
+[2026-01-11T17:39:22.692Z]  Container ecom-media-service  Healthy
+[2026-01-11T17:39:22.692Z]  Container ecom-product-service  Healthy
+[2026-01-11T17:39:22.692Z]  Container ecom-user-service  Healthy
+[2026-01-11T17:39:22.692Z]  Container ecom-api-gateway  Starting
+[2026-01-11T17:39:22.692Z]  Container ecom-api-gateway  Started
+[2026-01-11T17:39:22.692Z]  Container ecom-api-gateway  Waiting
+[2026-01-11T17:39:40.806Z]  Container ecom-api-gateway  Healthy
+[2026-01-11T17:39:40.806Z]  Container ecom-frontend  Starting
+[2026-01-11T17:39:40.806Z]  Container ecom-frontend  Started
+[2026-01-11T17:39:40.806Z] + echo Waiting for services to start...
+[2026-01-11T17:39:40.806Z] Waiting for services to start...
+[2026-01-11T17:39:40.806Z] + sleep 30
+[2026-01-11T17:40:12.837Z] + docker-compose -f docker-compose.yml -f docker-compose.ci.yml ps
+[2026-01-11T17:40:12.837Z] NAME                   IMAGE                            COMMAND                  SERVICE           CREATED         STATUS                        PORTS
+[2026-01-11T17:40:12.837Z] ecom-api-gateway       e-com-pipeline-api-gateway       "java -jar app.jar"      api-gateway       2 minutes ago   Up 47 seconds (healthy)       0.0.0.0:8080->8080/tcp, :::8080->8080/tcp
+[2026-01-11T17:40:12.837Z] ecom-eureka-server     e-com-pipeline-eureka-server     "java -jar app.jar"      eureka-server     2 minutes ago   Up 2 minutes (healthy)        0.0.0.0:8761->8761/tcp, :::8761->8761/tcp
+[2026-01-11T17:40:12.837Z] ecom-frontend          e-com-pipeline-frontend          "/docker-entrypoint.…"   frontend          2 minutes ago   Up 30 seconds                 0.0.0.0:4200->443/tcp, :::4200->443/tcp
+[2026-01-11T17:40:12.837Z] ecom-kafka             apache/kafka:3.8.1               "/__cacert_entrypoin…"   kafka             2 minutes ago   Up 2 minutes                  9092/tcp
+[2026-01-11T17:40:12.837Z] ecom-media-service     e-com-pipeline-media-service     "java -jar app.jar"      media-service     2 minutes ago   Up About a minute (healthy)   8083/tcp
+[2026-01-11T17:40:12.837Z] ecom-mongodb           mongo:latest                     "docker-entrypoint.s…"   mongodb           2 minutes ago   Up 2 minutes (healthy)        0.0.0.0:27017->27017/tcp, :::27017->27017/tcp
+[2026-01-11T17:40:12.837Z] ecom-product-service   e-com-pipeline-product-service   "java -jar app.jar"      product-service   2 minutes ago   Up About a minute (healthy)   8082/tcp
+[2026-01-11T17:40:12.837Z] ecom-user-service      e-com-pipeline-user-service      "java -jar app.jar"      user-service      2 minutes ago   Up About a minute (healthy)   8081/tcp
+[2026-01-11T17:40:12.837Z] + docker ps --filter name=ecom- --filter health=unhealthy --format {{.Names}}
+[2026-01-11T17:40:12.837Z] + UNHEALTHY=
+[2026-01-11T17:40:12.837Z] + [ -n  ]
+[2026-01-11T17:40:12.837Z] + echo ✅ Deployment successful - all services healthy
+[2026-01-11T17:40:12.837Z] ✅ Deployment successful - all services healthy
+[2026-01-11T17:40:15.394Z] ✅ Saving deployment state
+[2026-01-11T17:40:15.828Z] + echo BUILD_NUMBER=166
+[2026-01-11T17:40:15.831Z] + echo GIT_COMMIT=e1f5f23d7e93e7a764f4e3b9ac99f15041fda674
+[2026-01-11T17:40:15.831Z] + date -u +%Y-%m-%dT%H:%M:%SZ
+[2026-01-11T17:40:15.831Z] + echo TIMESTAMP=2026-01-11T17:40:15Z

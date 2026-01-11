@@ -160,7 +160,7 @@ pipeline {
 
                         # Wait for services to be healthy
                         echo "Waiting for services to start..."
-                        sleep 30
+                        sleep 20
 
                         # Verify services are running
                         docker-compose -f docker-compose.yml -f docker-compose.ci.yml ps

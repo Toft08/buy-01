@@ -26,34 +26,32 @@ pipeline {
             }
         }
 
-                stage('Backend Tests') {
-                    steps {
-                        sh '''
-                            cd backend || exit 1
+        stage('Backend Tests') {
+            steps {
+                sh '''
+                    cd backend || exit 1
 
-                            # Build shared module first
-                            cd shared && ../mvnw clean install -DskipTests && cd ..
+                    # Build shared module first
+                    cd shared && ../mvnw clean install -DskipTests && cd ..
 
-                            # Run tests for each service (pipeline fails if any test fails)
-                            cd services/user && ../../mvnw test && cd ../..
-                            cd services/product && ../../mvnw test && cd ../..
-                            cd services/media && ../../mvnw test && cd ../..
-                            cd services/eureka && ../../mvnw test && cd ../..
-                            cd api-gateway && ../mvnw test
-                        '''
-                    }
-                }
+                    # Run tests for each service (pipeline fails if any test fails)
+                    cd services/user && ../../mvnw test && cd ../..
+                    cd services/product && ../../mvnw test && cd ../..
+                    cd services/media && ../../mvnw test && cd ../..
+                    cd services/eureka && ../../mvnw test && cd ../..
+                    cd api-gateway && ../mvnw test
+                '''
+            }
+        }
 
-                stage('Frontend Tests') {
-                    steps {
-                        sh '''
-                            echo "Running frontend tests"
-                            cd frontend
-                            npm ci
-                            npm run test -- --code-coverage=false
-                        '''
-                    }
-                }
+        stage('Frontend Tests') {
+            steps {
+                sh '''
+                    echo "Running frontend tests"
+                    cd frontend
+                    npm ci
+                    npm run test -- --code-coverage=false
+                '''
             }
         }
 

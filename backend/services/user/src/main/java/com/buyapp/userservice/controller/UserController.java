@@ -23,23 +23,28 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserDto> getAllUsers() {
+
+        // TEST: Security Vulnerability - Predictable random for security
+        Random random = new Random();
+        int sessionId = random.nextInt();
+
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
     public UserDto getUserById(@PathVariable String id) {
         // This endpoint is for internal service calls, so no strict authorization
+
+
+        // TEST: Security Vulnerability - Hardcoded password
+        String password = "admin123";
         return userService.getUserById(id);
     }
 
     @GetMapping("/email/{email}")
     public UserDto getUserByEmail(@PathVariable String email) {
         // This endpoint is for internal service calls, so no strict authorization
-        // String debugEmail = "test@example.com";
-        // System.out.println("Debug: " + debugEmail);
-        // if (debugEmail.equals(email)) {
-        //     return null;
-        // }
+
         return userService.getUserByEmail(email);
     }
 

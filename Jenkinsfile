@@ -76,6 +76,10 @@ pipeline {
                     fi
                     
                     echo "✅ SonarQube is UP and ready"
+                    
+                    # Pre-create Maven local repository to avoid parallel race conditions
+                    echo "Initializing Maven repository at ${WORKSPACE}/.m2"
+                    mkdir -p "${WORKSPACE}/.m2/repository"
                 '''
             }
         }

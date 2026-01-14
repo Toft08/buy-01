@@ -1,12 +1,8 @@
 pipeline {
     agent any
 
-    // Automatic build trigger via GitHub webhook
-    triggers {
-        githubPush()
-    }
-
     options {
+        disableConcurrentBuilds()
         timeout(time: 30, unit: 'MINUTES')
         timestamps()
     }
@@ -95,6 +91,7 @@ pipeline {
                                 ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                                     -Dsonar.projectKey=e-com-user-service \
                                     -Dsonar.projectName="User Service" \
+                                    -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
                                     -Dsonar.host.url=http://host.docker.internal:9000
                             '''
                         }
@@ -113,6 +110,7 @@ pipeline {
                                 ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                                     -Dsonar.projectKey=e-com-product-service \
                                     -Dsonar.projectName="Product Service" \
+                                    -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
                                     -Dsonar.host.url=http://host.docker.internal:9000
                             '''
                         }
@@ -131,6 +129,7 @@ pipeline {
                                 ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                                     -Dsonar.projectKey=e-com-media-service \
                                     -Dsonar.projectName="Media Service" \
+                                    -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
                                     -Dsonar.host.url=http://host.docker.internal:9000
                             '''
                         }
@@ -149,6 +148,7 @@ pipeline {
                                 ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                                     -Dsonar.projectKey=e-com-eureka-service \
                                     -Dsonar.projectName="Eureka Service" \
+                                    -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
                                     -Dsonar.host.url=http://host.docker.internal:9000
                             '''
                         }
@@ -167,6 +167,7 @@ pipeline {
                                 ../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                                     -Dsonar.projectKey=e-com-api-gateway \
                                     -Dsonar.projectName="API Gateway" \
+                                    -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
                                     -Dsonar.host.url=http://host.docker.internal:9000
                             '''
                         }
@@ -236,89 +237,75 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Save current running images for rollback
                     sh '''
-                        mkdir -p .deployment-state
-
-                        # Save currently running image IDs before deployment
-                        echo "Saving current deployment state for rollback..."
-                        docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep -E "ecom-|e-commerce" > .deployment-state/previous-images.txt || echo "No previous images found" > .deployment-state/previous-images.txt
-
-                        # Save current container state
-                        docker ps --filter "name=ecom-" --format "{{.Names}} {{.Image}}" > .deployment-state/previous-containers.txt || true
-                    '''
-
-                    // Deploy new version
-                    sh '''
-                        # Stop old containers
-                        docker-compose -f docker-compose.yml -f docker-compose.ci.yml down || true
-
-                        # Force remove any lingering containers with ecom- prefix
-                        docker ps -a | grep ecom- | awk '{print $1}' | xargs -r docker rm -f || true
-
-                        # Start new containers
-                        echo "Deploying new version..."
+                        echo "Deploying build #${BUILD_NUMBER}"
+                        
+                        # Calculate previous build number for cleanup
+                        PREVIOUS_BUILD=$((BUILD_NUMBER - 1))
+                        
+                        # Remove any existing containers with current build number (from failed previous attempts)
+                        docker ps -a --filter "name=ecom-.*-${BUILD_NUMBER}" --format "{{.Names}}" | xargs -r docker rm -f || true
+                        
+                        # Start stateful services (MongoDB, Kafka) first if not running
+                        # These are singletons (no versioning) and persist across deployments
+                        docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d mongodb kafka
+                        sleep 5
+                        
+                        # Deploy versioned application services with BUILD_NUMBER
+                        # Old version stays running until new version is healthy
+                        export BUILD_NUMBER
                         docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
-
-                        # Wait for services to be healthy
-                        echo "Waiting for services to start..."
                         sleep 30
-
-                        # Verify services are running
                         docker-compose -f docker-compose.yml -f docker-compose.ci.yml ps
 
-                        # Check if all services are healthy
-                        UNHEALTHY=$(docker ps --filter "name=ecom-" --filter "health=unhealthy" --format "{{.Names}}" || true)
+                        UNHEALTHY=$(docker ps --filter "name=ecom-.*-${BUILD_NUMBER}" --filter "health=unhealthy" --format "{{.Names}}" || true)
                         if [ -n "$UNHEALTHY" ]; then
-                            echo "ERROR: Unhealthy services detected: $UNHEALTHY"
+                            echo "ERROR: Unhealthy services in build #${BUILD_NUMBER}: $UNHEALTHY"
                             exit 1
                         fi
 
-                        echo "✅ Deployment successful - all services healthy"
+                        echo "Build #${BUILD_NUMBER} deployed successfully"
+                        
+                        # Remove previous build containers if they exist
+                        if [ "$PREVIOUS_BUILD" -gt "0" ]; then
+                            docker ps -a --filter "name=ecom-.*-${PREVIOUS_BUILD}" --format "{{.Names}}" | xargs -r docker rm -f || true
+                            echo "Removed build #${PREVIOUS_BUILD} containers"
+                        fi
                     '''
                 }
             }
             post {
                 failure {
                     script {
-                        echo "❌ Deployment failed - Initiating rollback to previous working version"
+                        echo "Deployment failed - initiating rollback"
                         sh '''
-                            # Stop failed deployment
-                            docker-compose -f docker-compose.yml -f docker-compose.ci.yml down || true
-
-                            # Check if we have a previous state to restore
-                            if [ -f .deployment-state/previous-containers.txt ] && [ -s .deployment-state/previous-containers.txt ]; then
-                                echo "Restoring previous deployment..."
-
-                                # Read previous image tags and restore them
-                                if [ -f .deployment-state/previous-images.txt ]; then
-                                    echo "Previous images:"
-                                    cat .deployment-state/previous-images.txt
+                            PREVIOUS_BUILD=$((BUILD_NUMBER - 1))
+                            
+                            echo "Rolling back: build #${BUILD_NUMBER} -> build #${PREVIOUS_BUILD}"
+                            
+                            # Remove failed build containers
+                            docker ps -a --filter "name=ecom-.*-${BUILD_NUMBER}" --format "{{.Names}}" | xargs -r docker rm -f || true
+                            
+                            # Check if previous build containers exist
+                            if [ "$PREVIOUS_BUILD" -gt "0" ]; then
+                                OLD_CONTAINERS=$(docker ps --filter "name=ecom-.*-${PREVIOUS_BUILD}" --format "{{.Names}}" | wc -l)
+                                if [ "$OLD_CONTAINERS" -gt 0 ]; then
+                                    echo "Build #${PREVIOUS_BUILD} still running - no downtime"
+                                    docker ps --filter "name=ecom-.*-${PREVIOUS_BUILD}" --format "table {{.Names}}\t{{.Status}}"
+                                else
+                                    export BUILD_NUMBER=$PREVIOUS_BUILD
+                                    docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d || {
+                                        echo "ERROR: Could not restore build #${PREVIOUS_BUILD}"
+                                        exit 1
+                                    }
+                                    sleep 15
+                                    echo "Build #${PREVIOUS_BUILD} restored"
                                 fi
-
-                                # Attempt to restart with previous images
-                                # Note: This assumes previous images still exist
-                                docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d || {
-                                    echo "⚠️  Could not restore previous deployment - manual intervention required"
-                                    exit 1
-                                }
-
-                                echo "✅ Rollback completed - previous version restored"
                             else
-                                echo "⚠️  No previous deployment found to rollback to"
-                                echo "System is currently down - manual intervention required"
+                                echo "No previous version available (first deployment)"
                             fi
-                        '''
-                    }
-                }
-                success {
-                    script {
-                        echo "✅ Deployment successful - saving deployment state"
-                        sh '''
-                            # Save successful deployment info
-                            echo "BUILD_NUMBER=${BUILD_NUMBER}" > .deployment-state/last-successful.txt
-                            echo "GIT_COMMIT=${GIT_COMMIT}" >> .deployment-state/last-successful.txt
-                            echo "TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .deployment-state/last-successful.txt
+                            
+                            echo "Rollback complete - running v$PREVIOUS_VERSION"
                         '''
                     }
                 }

@@ -85,90 +85,90 @@ pipeline {
             }
         }
 
-        stage('SonarQube Backend Analysis') {
-            parallel {
-                stage('User Service') {
-                    steps {
-                        script {
-                            withSonarQubeEnv('SonarQube') {
-                                dir('backend/services/user') {
-                                    sh '''
-                                        echo "Analyzing User Service..."
-                                        ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                                            -Dsonar.projectKey=e-com-user-service \
-                                            -Dsonar.projectName="User Service" \
-                                            -Dsonar.host.url=http://host.docker.internal:9000
-                                    '''
-                                }
-                            }
+        stage('User Service Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQube') {
+                        dir('backend/services/user') {
+                            sh '''
+                                echo "Analyzing User Service..."
+                                ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                                    -Dsonar.projectKey=e-com-user-service \
+                                    -Dsonar.projectName="User Service" \
+                                    -Dsonar.host.url=http://host.docker.internal:9000
+                            '''
                         }
                     }
                 }
-                stage('Product Service') {
-                    steps {
-                        script {
-                            withSonarQubeEnv('SonarQube') {
-                                dir('backend/services/product') {
-                                    sh '''
-                                        echo "Analyzing Product Service..."
-                                        ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                                            -Dsonar.projectKey=e-com-product-service \
-                                            -Dsonar.projectName="Product Service" \
-                                            -Dsonar.host.url=http://host.docker.internal:9000
-                                    '''
-                                }
-                            }
+            }
+        }
+
+        stage('Product Service Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQube') {
+                        dir('backend/services/product') {
+                            sh '''
+                                echo "Analyzing Product Service..."
+                                ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                                    -Dsonar.projectKey=e-com-product-service \
+                                    -Dsonar.projectName="Product Service" \
+                                    -Dsonar.host.url=http://host.docker.internal:9000
+                            '''
                         }
                     }
                 }
-                stage('Media Service') {
-                    steps {
-                        script {
-                            withSonarQubeEnv('SonarQube') {
-                                dir('backend/services/media') {
-                                    sh '''
-                                        echo "Analyzing Media Service..."
-                                        ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                                            -Dsonar.projectKey=e-com-media-service \
-                                            -Dsonar.projectName="Media Service" \
-                                            -Dsonar.host.url=http://host.docker.internal:9000
-                                    '''
-                                }
-                            }
+            }
+        }
+
+        stage('Media Service Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQube') {
+                        dir('backend/services/media') {
+                            sh '''
+                                echo "Analyzing Media Service..."
+                                ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                                    -Dsonar.projectKey=e-com-media-service \
+                                    -Dsonar.projectName="Media Service" \
+                                    -Dsonar.host.url=http://host.docker.internal:9000
+                            '''
                         }
                     }
                 }
-                stage('Eureka Service') {
-                    steps {
-                        script {
-                            withSonarQubeEnv('SonarQube') {
-                                dir('backend/services/eureka') {
-                                    sh '''
-                                        echo "Analyzing Eureka Service..."
-                                        ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                                            -Dsonar.projectKey=e-com-eureka-service \
-                                            -Dsonar.projectName="Eureka Service" \
-                                            -Dsonar.host.url=http://host.docker.internal:9000
-                                    '''
-                                }
-                            }
+            }
+        }
+
+        stage('Eureka Service Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQube') {
+                        dir('backend/services/eureka') {
+                            sh '''
+                                echo "Analyzing Eureka Service..."
+                                ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                                    -Dsonar.projectKey=e-com-eureka-service \
+                                    -Dsonar.projectName="Eureka Service" \
+                                    -Dsonar.host.url=http://host.docker.internal:9000
+                            '''
                         }
                     }
                 }
-                stage('API Gateway') {
-                    steps {
-                        script {
-                            withSonarQubeEnv('SonarQube') {
-                                dir('backend/api-gateway') {
-                                    sh '''
-                                        echo "Analyzing API Gateway..."
-                                        ../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                                            -Dsonar.projectKey=e-com-api-gateway \
-                                            -Dsonar.projectName="API Gateway" \
-                                            -Dsonar.host.url=http://host.docker.internal:9000
-                                    '''
-                                }
-                            }
+            }
+        }
+
+        stage('API Gateway Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQube') {
+                        dir('backend/api-gateway') {
+                            sh '''
+                                echo "Analyzing API Gateway..."
+                                ../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                                    -Dsonar.projectKey=e-com-api-gateway \
+                                    -Dsonar.projectName="API Gateway" \
+                                    -Dsonar.host.url=http://host.docker.internal:9000
+                            '''
                         }
                     }
                 }

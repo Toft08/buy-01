@@ -335,6 +335,32 @@ pipeline {
                 def commitMessage = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
                 env.COMMIT_MESSAGE = commitMessage
 
+                // Report status to GitHub (for PRs and commits)
+                def buildState = currentBuild.currentResult?.toLowerCase() ?: 'success'
+                def ghState = (buildState == 'success') ? 'success' : 'failure'
+                
+                if (env.GIT_COMMIT) {
+                    withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                        sh """
+                            set +e
+                            
+                            # Report Jenkins build status
+                            curl -s -H "Authorization: token \${GITHUB_TOKEN}" \\
+                                -X POST -H "Accept: application/vnd.github.v3+json" \\
+                                -d '{"state":"${ghState}", "context":"Jenkins", "description":"Build ${buildState}", "target_url":"${BUILD_URL}"}' \\
+                                https://api.github.com/repos/Toft08/e-com/statuses/\${GIT_COMMIT} || true
+                            
+                            # Report SonarQube quality gate status
+                            curl -s -H "Authorization: token \${GITHUB_TOKEN}" \\
+                                -X POST -H "Accept: application/vnd.github.v3+json" \\
+                                -d '{"state":"${ghState}", "context":"SonarQube quality gate check", "description":"Quality gate ${buildState}"}' \\
+                                https://api.github.com/repos/Toft08/e-com/statuses/\${GIT_COMMIT} || true
+                            
+                            exit 0
+                        """
+                    }
+                }
+
                 // Archive test results (backend and frontend combined)
                 junit allowEmptyResults: true, testResults: 'backend/**/target/surefire-reports/*.xml, frontend/test-results/*.xml'
 

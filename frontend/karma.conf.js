@@ -8,7 +8,6 @@ module.exports = function (config) {
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
-      require('karma-junit-reporter'),
     ],
     client: {
       jasmine: {
@@ -21,23 +20,15 @@ module.exports = function (config) {
       suppressAll: true,
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage'),
+      dir: require('path').join(__dirname, './coverage/e-com'),
       subdir: '.',
-      reporters: [{ type: 'html' }, { type: 'text-summary' }, { type: 'lcovonly' }],
+      reporters: [
+        { type: 'html' },
+        { type: 'text-summary' },
+        { type: 'lcovonly', file: 'lcov.info' },
+      ],
     },
-    junitReporter: {
-      outputDir: require('path').join(__dirname, './test-results'),
-      outputFile: 'junit.xml',
-      useBrowserName: false,
-      suite: 'frontend',
-      nameFormatter: undefined,
-      classNameFormatter: function (browser, result) {
-        return 'frontend.' + (result.suite[0] || 'tests');
-      },
-      stdOut: true,
-      stdErr: true,
-    },
-    reporters: ['progress', 'kjhtml', 'coverage', 'junit'],
+    reporters: ['progress', 'kjhtml', 'coverage'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,

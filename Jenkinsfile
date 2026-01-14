@@ -89,7 +89,7 @@ pipeline {
                                 dir('backend/services/user') {
                                     sh '''
                                         echo "Analyzing User Service..."
-                                        ../../mvnw sonar:sonar \
+                                        ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                                             -Dsonar.projectKey=e-com-user-service \
                                             -Dsonar.projectName="User Service" \
                                             -Dsonar.host.url=http://host.docker.internal:9000
@@ -106,7 +106,7 @@ pipeline {
                                 dir('backend/services/product') {
                                     sh '''
                                         echo "Analyzing Product Service..."
-                                        ../../mvnw sonar:sonar \
+                                        ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                                             -Dsonar.projectKey=e-com-product-service \
                                             -Dsonar.projectName="Product Service" \
                                             -Dsonar.host.url=http://host.docker.internal:9000
@@ -123,7 +123,7 @@ pipeline {
                                 dir('backend/services/media') {
                                     sh '''
                                         echo "Analyzing Media Service..."
-                                        ../../mvnw sonar:sonar \
+                                        ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                                             -Dsonar.projectKey=e-com-media-service \
                                             -Dsonar.projectName="Media Service" \
                                             -Dsonar.host.url=http://host.docker.internal:9000
@@ -140,7 +140,7 @@ pipeline {
                                 dir('backend/services/eureka') {
                                     sh '''
                                         echo "Analyzing Eureka Service..."
-                                        ../../mvnw sonar:sonar \
+                                        ../../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                                             -Dsonar.projectKey=e-com-eureka-service \
                                             -Dsonar.projectName="Eureka Service" \
                                             -Dsonar.host.url=http://host.docker.internal:9000
@@ -157,7 +157,7 @@ pipeline {
                                 dir('backend/api-gateway') {
                                     sh '''
                                         echo "Analyzing API Gateway..."
-                                        ../mvnw sonar:sonar \
+                                        ../mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                                             -Dsonar.projectKey=e-com-api-gateway \
                                             -Dsonar.projectName="API Gateway" \
                                             -Dsonar.host.url=http://host.docker.internal:9000

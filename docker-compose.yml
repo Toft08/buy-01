@@ -62,7 +62,7 @@ services:
     build:
       context: ./backend
       dockerfile: ./services/eureka/Dockerfile
-    container_name: ecom-eureka-server-${DEPLOY_VERSION:-1}
+    container_name: ecom-eureka-server-${BUILD_NUMBER:-1}
     ports:
       - '8761:8761'
     networks:
@@ -77,7 +77,7 @@ services:
     build:
       context: ./backend
       dockerfile: ./api-gateway/Dockerfile
-    container_name: ecom-api-gateway-${DEPLOY_VERSION:-1}
+    container_name: ecom-api-gateway-${BUILD_NUMBER:-1}
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
     ports:
@@ -104,7 +104,7 @@ services:
     build:
       context: ./backend
       dockerfile: ./services/user/Dockerfile
-    container_name: ecom-user-service-${DEPLOY_VERSION:-1}
+    container_name: ecom-user-service-${BUILD_NUMBER:-1}
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
@@ -134,7 +134,7 @@ services:
     build:
       context: ./backend
       dockerfile: ./services/product/Dockerfile
-    container_name: ecom-product-service-${DEPLOY_VERSION:-1}
+    container_name: ecom-product-service-${BUILD_NUMBER:-1}
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
@@ -164,7 +164,7 @@ services:
     build:
       context: ./backend
       dockerfile: ./services/media/Dockerfile
-    container_name: ecom-media-service-${DEPLOY_VERSION:-1}
+    container_name: ecom-media-service-${BUILD_NUMBER:-1}
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: true

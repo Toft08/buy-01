@@ -237,57 +237,40 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Initialize or increment deployment version
                     sh '''
-                        mkdir -p .deployment-state
+                        echo "Deploying build #${BUILD_NUMBER}"
                         
-                        if [ -f .deployment-state/current-version.txt ]; then
-                            CURRENT_VERSION=$(cat .deployment-state/current-version.txt)
-                        else
-                            CURRENT_VERSION=0
-                        fi
+                        # Calculate previous build number for cleanup
+                        PREVIOUS_BUILD=$((BUILD_NUMBER - 1))
                         
-                        NEXT_VERSION=$((CURRENT_VERSION + 1))
-                        echo $NEXT_VERSION > .deployment-state/next-version.txt
-                        echo $CURRENT_VERSION > .deployment-state/previous-version.txt
-                        
-                        echo "Deploying v$NEXT_VERSION (current: v$CURRENT_VERSION)"
-                    '''
-
-                    // Deploy new version with versioned containers
-                    sh '''
-                        DEPLOY_VERSION=$(cat .deployment-state/next-version.txt)
-                        PREVIOUS_VERSION=$(cat .deployment-state/previous-version.txt)
-                        export DEPLOY_VERSION
-                        
-                        # Remove any existing containers with the new version number (from failed previous attempts)
-                        docker ps -a --filter "name=ecom-.*-${DEPLOY_VERSION}" --format "{{.Names}}" | xargs -r docker rm -f || true
+                        # Remove any existing containers with current build number (from failed previous attempts)
+                        docker ps -a --filter "name=ecom-.*-${BUILD_NUMBER}" --format "{{.Names}}" | xargs -r docker rm -f || true
                         
                         # Start stateful services (MongoDB, Kafka) first if not running
                         # These are singletons (no versioning) and persist across deployments
                         docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d mongodb kafka
                         sleep 5
                         
-                        # Deploy versioned application services
+                        # Deploy versioned application services with BUILD_NUMBER
                         # Old version stays running until new version is healthy
+                        export BUILD_NUMBER
                         docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
                         sleep 30
                         docker-compose -f docker-compose.yml -f docker-compose.ci.yml ps
 
-                        UNHEALTHY=$(docker ps --filter "name=ecom-.*-${DEPLOY_VERSION}" --filter "health=unhealthy" --format "{{.Names}}" || true)
+                        UNHEALTHY=$(docker ps --filter "name=ecom-.*-${BUILD_NUMBER}" --filter "health=unhealthy" --format "{{.Names}}" || true)
                         if [ -n "$UNHEALTHY" ]; then
-                            echo "ERROR: Unhealthy services in v$DEPLOY_VERSION: $UNHEALTHY"
+                            echo "ERROR: Unhealthy services in build #${BUILD_NUMBER}: $UNHEALTHY"
                             exit 1
                         fi
 
-                        echo "v$DEPLOY_VERSION deployed successfully"
+                        echo "Build #${BUILD_NUMBER} deployed successfully"
                         
-                        if [ "$PREVIOUS_VERSION" != "0" ]; then
-                            docker ps -a --filter "name=ecom-.*-${PREVIOUS_VERSION}" --format "{{.Names}}" | xargs -r docker rm -f || true
-                            echo "Removed v$PREVIOUS_VERSION containers"
+                        # Remove previous build containers if they exist
+                        if [ "$PREVIOUS_BUILD" -gt "0" ]; then
+                            docker ps -a --filter "name=ecom-.*-${PREVIOUS_BUILD}" --format "{{.Names}}" | xargs -r docker rm -f || true
+                            echo "Removed build #${PREVIOUS_BUILD} containers"
                         fi
-                        
-                        echo $DEPLOY_VERSION > .deployment-state/current-version.txt
                     '''
                 }
             }
@@ -296,28 +279,27 @@ pipeline {
                     script {
                         echo "Deployment failed - initiating rollback"
                         sh '''
-                            FAILED_VERSION=$(cat .deployment-state/next-version.txt 2>/dev/null || echo "unknown")
-                            PREVIOUS_VERSION=$(cat .deployment-state/previous-version.txt 2>/dev/null || echo "0")
+                            PREVIOUS_BUILD=$((BUILD_NUMBER - 1))
                             
-                            echo "Rolling back: v$FAILED_VERSION -> v$PREVIOUS_VERSION"
+                            echo "Rolling back: build #${BUILD_NUMBER} -> build #${PREVIOUS_BUILD}"
                             
-                            if [ "$FAILED_VERSION" != "unknown" ]; then
-                                docker ps -a --filter "name=ecom-.*-${FAILED_VERSION}" --format "{{.Names}}" | xargs -r docker rm -f || true
-                            fi
+                            # Remove failed build containers
+                            docker ps -a --filter "name=ecom-.*-${BUILD_NUMBER}" --format "{{.Names}}" | xargs -r docker rm -f || true
                             
-                            if [ "$PREVIOUS_VERSION" != "0" ]; then
-                                OLD_CONTAINERS=$(docker ps --filter "name=ecom-.*-${PREVIOUS_VERSION}" --format "{{.Names}}" | wc -l)
+                            # Check if previous build containers exist
+                            if [ "$PREVIOUS_BUILD" -gt "0" ]; then
+                                OLD_CONTAINERS=$(docker ps --filter "name=ecom-.*-${PREVIOUS_BUILD}" --format "{{.Names}}" | wc -l)
                                 if [ "$OLD_CONTAINERS" -gt 0 ]; then
-                                    echo "v$PREVIOUS_VERSION still running - no downtime"
-                                    docker ps --filter "name=ecom-.*-${PREVIOUS_VERSION}" --format "table {{.Names}}\t{{.Status}}"
+                                    echo "Build #${PREVIOUS_BUILD} still running - no downtime"
+                                    docker ps --filter "name=ecom-.*-${PREVIOUS_BUILD}" --format "table {{.Names}}\t{{.Status}}"
                                 else
-                                    export DEPLOY_VERSION=$PREVIOUS_VERSION
+                                    export BUILD_NUMBER=$PREVIOUS_BUILD
                                     docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d || {
-                                        echo "ERROR: Could not restore v$PREVIOUS_VERSION"
+                                        echo "ERROR: Could not restore build #${PREVIOUS_BUILD}"
                                         exit 1
                                     }
                                     sleep 15
-                                    echo "v$PREVIOUS_VERSION restored"
+                                    echo "Build #${PREVIOUS_BUILD} restored"
                                 fi
                             else
                                 echo "No previous version available (first deployment)"

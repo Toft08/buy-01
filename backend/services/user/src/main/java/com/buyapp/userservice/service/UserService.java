@@ -16,6 +16,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 @Service
 public class UserService {
@@ -31,6 +35,28 @@ public class UserService {
 
     @Autowired
     private UserEventProducer userEventProducer;
+
+    // INTENTIONAL SONARQUBE VIOLATIONS FOR TESTING
+    // This method contains multiple security vulnerabilities and code smells
+    public String testSonarQubeDetection(String userInput) {
+        String hardcodedPassword = "admin123"; // S2068: Hard-coded credentials
+        
+        try {
+            // S2077: SQL Injection vulnerability
+            String query = "SELECT * FROM users WHERE email = '" + userInput + "'";
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/db", "root", hardcodedPassword);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            
+            // S2095: Resources should be closed
+            // Not closing connection, statement, or result set
+            
+            return "Query executed"; // S1172: Unused return value
+        } catch (Exception e) {
+            e.printStackTrace(); // S2139: Don't use printStackTrace
+            return null; // S1168: Return empty collection instead of null
+        }
+    }
 
     // Helper method to get User from UserDetails
     private User getUserFromUserDetails(UserDetails userDetails) {

@@ -14,6 +14,7 @@ pipeline {
         PATH = "${JAVA_HOME}/bin:${NODE_HOME ?: '/usr'}/bin:${PATH}"
         DOCKER_BUILDKIT = '1'
         MAVEN_OPTS = "-Dmaven.repo.local=${WORKSPACE}/.m2"
+        COMPOSE_PROJECT_NAME = 'ecom'  // Fixed project name - all branches share same infra containers
     }
 
     stages {
@@ -246,9 +247,22 @@ pipeline {
                         # Remove any existing containers with current build number (from failed previous attempts)
                         docker ps -a --filter "name=ecom-.*-${BUILD_NUMBER}" --format "{{.Names}}" | xargs -r docker rm -f || true
                         
-                        # Start stateful services (MongoDB, Kafka) first if not running
-                        # These are singletons (no versioning) and persist across deployments
-                        docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d mongodb kafka
+                        # Ensure stateful services exist (create once, persist across deployments)
+                        # Use docker-compose ps to check existence (handles project prefixes correctly)
+                        if ! docker-compose -f docker-compose.yml -f docker-compose.ci.yml ps mongodb | grep -q "Up\|running"; then
+                            echo "Creating MongoDB (first time setup)"
+                            docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d mongodb
+                        else
+                            echo "MongoDB already running"
+                        fi
+                        
+                        if ! docker-compose -f docker-compose.yml -f docker-compose.ci.yml ps kafka | grep -q "Up\|running"; then
+                            echo "Creating Kafka (first time setup)"
+                            docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d kafka
+                        else
+                            echo "Kafka already running"
+                        fi
+                        
                         sleep 5
                         
                         # Deploy versioned application services with BUILD_NUMBER
